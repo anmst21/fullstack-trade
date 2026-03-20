@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 export interface Trade {
   coin: string;
-  side: 'B' | 'A';
+  side: "B" | "A";
   px: string;
   sz: string;
   time: number;
@@ -23,13 +23,13 @@ export interface Book {
   spread: string | null;
 }
 
-const WS_URL = 'wss://api.hyperliquid.xyz/ws';
+const WS_URL = "wss://api.hyperliquid.xyz/ws";
 const MAX_TRADES = 50;
 const RECONNECT_DELAY = 2000;
 
-export function useHyperliquid(coin = 'BTC', nSigFigs?: 2 | 3 | 4 | 5) {
+export function useHyperliquid(coin = "BTC", nSigFigs?: 2 | 3 | 4 | 5) {
   const [trades, setTrades] = useState<Trade[]>([]);
-  const [book, setBook] = useState<Book>({ bids: [], asks: [] });
+  const [book, setBook] = useState<Book>({ bids: [], asks: [], spread: null });
   const ws = useRef<WebSocket | null>(null);
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const connId = useRef(0); // incremented on each effect run to invalidate stale callbacks
@@ -46,21 +46,35 @@ export function useHyperliquid(coin = 'BTC', nSigFigs?: 2 | 3 | 4 | 5) {
       ws.current = socket;
 
       socket.onopen = () => {
-        socket.send(JSON.stringify({ method: 'subscribe', subscription: { type: 'trades', coin } }));
-        socket.send(JSON.stringify({ method: 'subscribe', subscription: { type: 'l2Book', coin, ...(nSigFigs ? { nSigFigs } : {}) } }));
+        socket.send(
+          JSON.stringify({
+            method: "subscribe",
+            subscription: { type: "trades", coin },
+          }),
+        );
+        socket.send(
+          JSON.stringify({
+            method: "subscribe",
+            subscription: {
+              type: "l2Book",
+              coin,
+              ...(nSigFigs ? { nSigFigs } : {}),
+            },
+          }),
+        );
       };
 
       socket.onmessage = (event) => {
         if (id !== connId.current) return;
         try {
           const msg = JSON.parse(event.data);
-          console.log('[HL WS]', msg);
+          console.log("[HL WS]", msg);
 
-          if (msg.channel === 'trades' && Array.isArray(msg.data)) {
+          if (msg.channel === "trades" && Array.isArray(msg.data)) {
             setTrades((prev) => [...msg.data, ...prev].slice(0, MAX_TRADES));
           }
 
-          if (msg.channel === 'l2Book' && msg.data?.levels) {
+          if (msg.channel === "l2Book" && msg.data?.levels) {
             const [bids, asks] = msg.data.levels as [Level[], Level[]];
             setBook({ bids, asks, spread: msg.data.spread ?? null });
           }
@@ -84,7 +98,27 @@ export function useHyperliquid(coin = 'BTC', nSigFigs?: 2 | 3 | 4 | 5) {
     return () => {
       connId.current++; // invalidate this effect's callbacks
       if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
-      ws.current?.close();
+      const socket = ws.current;
+      ws.current = null;
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(
+          JSON.stringify({
+            method: "unsubscribe",
+            subscription: { type: "trades", coin },
+          }),
+        );
+        socket.send(
+          JSON.stringify({
+            method: "unsubscribe",
+            subscription: {
+              type: "l2Book",
+              coin,
+              ...(nSigFigs ? { nSigFigs } : {}),
+            },
+          }),
+        );
+      }
+      socket?.close(1000, "unmounting");
     };
   }, [coin, nSigFigs]);
 
