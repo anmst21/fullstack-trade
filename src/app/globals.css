@@ -12,6 +12,23 @@
   --font-mono: var(--font-fira-code);
 }
 
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg,
+    rgba(167,167,183,0.03) 0%,
+    rgba(167,167,183,0.04) 25%,
+    rgba(167,167,183,0.09) 50%,
+    rgba(167,167,183,0.04) 75%,
+    rgba(167,167,183,0.03) 100%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
 @keyframes dot-ring {
   0%, 100% { transform: scale(1); opacity: .4; }
   50% { transform: scale(1.5); opacity: 0; }

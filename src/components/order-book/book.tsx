@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { Book as BookData, Level } from '@/hooks/use-hyperliquid';
+import BookSkeleton from './skeleton';
 
 const ROW_COUNT = 11;
 
@@ -66,7 +67,8 @@ interface BookProps extends BookData {
   group: number;
 }
 
-export default function Book({ bids, asks, spread: apiSpread, asset, group }: BookProps) {
+export default function Book({ bids, asks, spread: apiSpread, asset, group, coin }: BookProps) {
+  const isLoading = bids.length === 0 && asks.length === 0;
   const isUSDC = asset === 'USDC';
   const szDecimals = isUSDC ? 0 : 5;
 
@@ -140,6 +142,8 @@ export default function Book({ bids, asks, spread: apiSpread, asset, group }: Bo
   const lowestAsk = topAsks[topAsks.length - 1] ? parseFloat(topAsks[topAsks.length - 1].px) : 0;
   const spreadPct = lowestAsk > 0 ? ((spread / lowestAsk) * 100).toFixed(3) : '0.000';
 
+  if (isLoading) return <BookSkeleton asset={asset} coin={coin} />;
+
   return (
     <div className="flex flex-col">
       {/* column headers */}
@@ -149,19 +153,21 @@ export default function Book({ bids, asks, spread: apiSpread, asset, group }: Bo
         <span className="text-right">Total ({asset})</span>
       </div>
 
-      {/* asks */}
-      {topAsks.map((level, i) => (
-        <Row
-          key={level.px}
-          px={level.px}
-          sz={askDisplaySizes[i]}
-          total={askTotals[i]}
-          maxTotal={maxTotal}
-          side="ask"
-          szDecimals={szDecimals}
-          flash={flashedPrices.has(level.px)}
-        />
-      ))}
+      {/* asks — fixed height, rows pinned to bottom so spread stays centered */}
+      <div className="flex flex-col justify-end" style={{ height: ROW_COUNT * 26 }}>
+        {topAsks.map((level, i) => (
+          <Row
+            key={level.px}
+            px={level.px}
+            sz={askDisplaySizes[i]}
+            total={askTotals[i]}
+            maxTotal={maxTotal}
+            side="ask"
+            szDecimals={szDecimals}
+            flash={flashedPrices.has(level.px)}
+          />
+        ))}
+      </div>
 
       {/* spread */}
       <div className="grid grid-cols-3 text-sm text-[#a7a7b7] px-3 py-[5px] bg-white/[0.03]">
@@ -170,19 +176,21 @@ export default function Book({ bids, asks, spread: apiSpread, asset, group }: Bo
         <span className="text-right">{spreadPct}%</span>
       </div>
 
-      {/* bids */}
-      {topBids.map((level, i) => (
-        <Row
-          key={level.px}
-          px={level.px}
-          sz={bidDisplaySizes[i]}
-          total={bidTotals[i]}
-          maxTotal={maxTotal}
-          side="bid"
-          szDecimals={szDecimals}
-          flash={flashedPrices.has(level.px)}
-        />
-      ))}
+      {/* bids — fixed height, rows from top */}
+      <div className="flex flex-col" style={{ height: ROW_COUNT * 26 }}>
+        {topBids.map((level, i) => (
+          <Row
+            key={level.px}
+            px={level.px}
+            sz={bidDisplaySizes[i]}
+            total={bidTotals[i]}
+            maxTotal={maxTotal}
+            side="bid"
+            szDecimals={szDecimals}
+            flash={flashedPrices.has(level.px)}
+          />
+        ))}
+      </div>
     </div>
   );
 }

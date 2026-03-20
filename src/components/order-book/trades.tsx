@@ -1,5 +1,6 @@
 import type { Trade } from "@/hooks/use-hyperliquid";
 import { Link } from "@/components/icons/link";
+import { TradesSkeleton } from "./skeleton";
 
 function formatTime(ms: number) {
   return new Date(ms).toLocaleTimeString("en-US", {
@@ -39,6 +40,7 @@ export default function Trades({ trades, coin }: TradesProps) {
           <div
             key={`${trade.hash}-${i}`}
             className="grid grid-cols-3 items-center text-sm font-mono py-[3px] px-3 hover:bg-white/5 cursor-default"
+            onClick={() => window.open(`https://app.hyperliquid.xyz/explorer/tx/${trade.hash}`, '_blank', 'noopener,noreferrer')}
           >
             <span style={{ color: isBuy ? "#A1FF00" : "#FF3100" }}>
               {fmt(trade.px, 0)}
@@ -60,11 +62,7 @@ export default function Trades({ trades, coin }: TradesProps) {
         );
       })}
 
-      {trades.length === 0 && (
-        <div className="py-8 text-center text-sm text-[#a7a7b7]">
-          Connecting…
-        </div>
-      )}
+      {trades.length === 0 && <TradesSkeleton coin={coin} />}
     </div>
   );
 }
