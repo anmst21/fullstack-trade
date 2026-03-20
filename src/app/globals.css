@@ -17,6 +17,24 @@
   50% { transform: scale(1.5); opacity: 0; }
 }
 
+@keyframes sz-flash-bid {
+  0% { background: rgba(161,255,0,0.25); }
+  100% { background: transparent; }
+}
+
+@keyframes sz-flash-ask {
+  0% { background: rgba(255,49,0,0.25); }
+  100% { background: transparent; }
+}
+
+.flash-row-bid {
+  animation: sz-flash-bid 300ms ease-out forwards;
+}
+
+.flash-row-ask {
+  animation: sz-flash-ask 300ms ease-out forwards;
+}
+
 body {
   background: var(--surface-0);
   color: var(--text-primary);
