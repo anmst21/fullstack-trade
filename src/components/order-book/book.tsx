@@ -44,7 +44,7 @@ const Row = memo(function Row({ px, sz, total, maxTotal, side, szDecimals, flash
   const isBid = side === 'bid';
 
   return (
-    <div className={`relative grid grid-cols-3 text-sm font-mono py-[3px] px-3 hover:bg-white/5 cursor-default${flash ? ` flash-row-${side}` : ''}`}>
+    <div className={`relative grid grid-cols-3 text-sm font-mono py-[3px] px-3 cursor-default${flash ? ` flash-row-${side}` : ''}`}>
       <span
         className="absolute top-0 bottom-0 pointer-events-none"
         style={{
@@ -54,9 +54,9 @@ const Row = memo(function Row({ px, sz, total, maxTotal, side, szDecimals, flash
           transition: 'width 200ms ease-out',
         }}
       />
-      <span style={{ color: isBid ? '#A1FF00' : '#FF3100' }}>{fmt(parseFloat(px), 0)}</span>
-      <span className="text-right text-[#c8c8d0]">{fmt(sz, szDecimals)}</span>
-      <span className="text-right text-[#c8c8d0]">{fmt(total, szDecimals)}</span>
+      <span className="hover:font-semibold" style={{ color: isBid ? '#A1FF00' : '#FF3100' }}>{fmt(parseFloat(px), 0)}</span>
+      <span className="text-right text-[#c8c8d0] hover:font-semibold">{fmt(sz, szDecimals)}</span>
+      <span className="text-right text-[#c8c8d0] hover:font-semibold">{fmt(total, szDecimals)}</span>
     </div>
   );
 });
