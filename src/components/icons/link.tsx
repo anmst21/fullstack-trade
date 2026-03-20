@@ -2,7 +2,7 @@ export const Link = () => (
   <svg
     width="14"
     height="14"
-    style={{ marginBottom: "-2.4px" }}
+    style={{ marginBottom: "1px" }}
     viewBox="-2 -2 16 16"
   >
     <path
