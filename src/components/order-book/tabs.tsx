@@ -1,27 +1,53 @@
-export type Tab = 'book' | 'trades';
+'use client';
 
-interface TabsProps {
-  active: Tab;
-  onChange: (tab: Tab) => void;
-}
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useRef, useLayoutEffect, useState } from 'react';
 
-export default function Tabs({ active, onChange }: TabsProps) {
+const TABS = [
+  { href: '/order-book', label: 'Order Book' },
+  { href: '/trades', label: 'Trades' },
+];
+
+export default function Tabs() {
+  const pathname = usePathname();
+  const tabRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const [indicator, setIndicator] = useState({ left: 0, width: 0 });
+
+  useLayoutEffect(() => {
+    const activeIdx = TABS.findIndex((t) => t.href === pathname);
+    const el = tabRefs.current[activeIdx];
+    if (!el) return;
+    setIndicator({ left: el.offsetLeft, width: el.offsetWidth });
+  }, [pathname]);
+
   return (
-    <div className="flex items-center border-b border-white/5">
-      {(['book', 'trades'] as Tab[]).map((tab) => (
-        <button
-          key={tab}
-          onClick={() => onChange(tab)}
-          className={[
-            'relative px-4 py-3 text-base font-medium transition-colors',
-            active === tab
-              ? 'text-[#fafafa] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-[#A1FF00]'
-              : 'text-[#a7a7b7] hover:text-[#fafafa]',
-          ].join(' ')}
-        >
-          {tab === 'book' ? 'Order Book' : 'Trades'}
-        </button>
-      ))}
+    <div className="relative flex items-center border-b border-white/5">
+      {TABS.map(({ href, label }, i) => {
+        const isActive = pathname === href;
+        return (
+          <Link
+            key={href}
+            ref={(el) => { tabRefs.current[i] = el; }}
+            href={href}
+            className={`px-4 py-3 text-base font-medium transition-colors ${
+              isActive ? 'text-[#fafafa]' : 'text-[#a7a7b7] hover:text-[#fafafa]'
+            }`}
+          >
+            {label}
+          </Link>
+        );
+      })}
+
+      {/* sliding indicator */}
+      <span
+        className="absolute bottom-0 h-[2px] bg-[#A1FF00]"
+        style={{
+          left: indicator.left,
+          width: indicator.width,
+          transition: 'left 0.2s ease-out, width 0.2s ease-out',
+        }}
+      />
 
       <button className="ml-auto px-4 py-3 text-[#a7a7b7] hover:text-[#fafafa] transition-colors">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
