@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Funnel_Sans, Fira_Code } from "next/font/google";
 import "./globals.css";
+import Header from "@/components/header";
 
 const funnelSans = Funnel_Sans({
   variable: "--font-funnel-sans",
@@ -24,7 +25,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${funnelSans.variable} ${firaCode.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <Header />
+        {children}
+      </body>
     </html>
   );
 }

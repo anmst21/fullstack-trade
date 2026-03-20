@@ -1,4 +1,4 @@
-import { Logo } from "../icons";
+import { Logo } from '../icons';
 
 export default function Header() {
   return (
@@ -19,7 +19,7 @@ export default function Header() {
             <span className="relative w-2 h-2 shrink-0">
               <span
                 className="absolute inset-0 rounded-full bg-[#f0f757]"
-                style={{ animation: "dot-ring 2s cubic-bezier(.4, 0, .6, 1) infinite" }}
+                style={{ animation: 'dot-ring 2s cubic-bezier(.4, 0, .6, 1) infinite' }}
                 aria-hidden="true"
               />
               <span className="relative w-2 h-2 rounded-full bg-[#FF3100] animate-pulse block" />
