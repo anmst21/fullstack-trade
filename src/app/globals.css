@@ -4,7 +4,18 @@
   --surface-0: #09090b;
   --text-primary: #fafafa;
   --text-secondary: #a7a7b7;
+  --text-tertiary: #c8c8d0;
   --brand-orange: #FF3100;
+
+  --color-bid: #A1FF00;
+  --color-ask: #FF3100;
+  --color-surface: #131316;
+  --color-surface-modal: #1c1c21;
+  --color-dot-ring: #f0f757;
+
+  --color-bid-bar: rgba(161, 255, 0, 0.08);
+  --color-ask-bar: rgba(255, 49, 0, 0.08);
+  --color-bid-badge: rgba(161, 255, 0, 0.1);
 }
 
 @theme inline {
@@ -35,12 +46,12 @@
 }
 
 @keyframes sz-flash-bid {
-  0% { background: rgba(161,255,0,0.25); }
+  0% { background: color-mix(in srgb, var(--color-bid) 25%, transparent); }
   100% { background: transparent; }
 }
 
 @keyframes sz-flash-ask {
-  0% { background: rgba(255,49,0,0.25); }
+  0% { background: color-mix(in srgb, var(--color-ask) 25%, transparent); }
   100% { background: transparent; }
 }
 
@@ -50,6 +61,17 @@
 
 .flash-row-ask {
   animation: sz-flash-ask 300ms ease-out forwards;
+}
+
+.token-btn .chev {
+  transition: transform 0.2s ease-out;
+}
+.token-btn:hover .chev {
+  transform: rotate(-90deg) translateY(2px);
+}
+.token-btn:active .chev,
+.token-btn.active .chev {
+  transform: rotate(-90deg) translateY(4px);
 }
 
 body {
