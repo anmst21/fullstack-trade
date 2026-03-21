@@ -74,7 +74,10 @@ export default function Trades({ trades, coin, layout = 'trades' }: TradesProps)
           <span className="text-right">Size</span>
         </div>
         {isEmpty ? (
-          <TradesSkeleton coin={coin} />
+          <>
+            <TradesSkeleton coin={coin} />
+            <TradesSkeleton coin={coin} />
+          </>
         ) : (
           <>
             <div className="flex flex-col">

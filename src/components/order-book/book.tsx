@@ -124,7 +124,7 @@ const DepthRow = memo(function DepthRow({
         {fmt(parseFloat(px), 0)}
       </span>
       <span
-        className={`text-[#c8c8d0] hover:font-semibold ${isBid ? "text-right" : "text-left"}`}
+        className="text-right text-[#c8c8d0] hover:font-semibold"
       >
         {fmt(sz, szDecimals)}
       </span>
@@ -231,7 +231,7 @@ export default function Book({
   const spreadPct =
     lowestAsk > 0 ? ((spread / lowestAsk) * 100).toFixed(3) : "0.000";
 
-  if (isLoading) return <BookSkeleton asset={asset} coin={coin} />;
+  if (isLoading) return <BookSkeleton asset={asset} coin={coin} layout={layout} />;
 
   // ── Depth View ────────────────────────────────────────────────────────────
   if (layout === "depth-view") {
@@ -247,7 +247,7 @@ export default function Book({
           </div>
           <div className="grid grid-cols-2 text-sm text-[#a7a7b7] py-2 px-2 border-b border-white/10">
             <span>Price</span>
-            <span className="text-left pl-1">Size</span>
+            <span className="text-right">Size</span>
           </div>
           {/* Asks — price DESC (lowest at bottom), bar from right */}
           <div className="flex flex-col justify-end">
