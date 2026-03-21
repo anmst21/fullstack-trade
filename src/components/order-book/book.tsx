@@ -150,7 +150,7 @@ export default function Book({
   const isLoading = bids.length === 0 && asks.length === 0;
   const isUSDC = asset === "USDC";
   const szDecimals = isUSDC ? 0 : 5;
-  const rowCount = layout === "order-book" ? ROW_COUNT : ROW_COUNT * 2 + 3;
+  const rowCount = layout === "order-book" ? ROW_COUNT : 20;
 
   const topAsks = useMemo(
     () =>
@@ -278,6 +278,14 @@ export default function Book({
             ))}
           </div>
         </div>
+        {/* spread */}
+        <div className="grid grid-cols-3 text-sm text-[#a7a7b7] px-3 py-[5px] bg-white/[0.03] cursor-default">
+          <span>Spread</span>
+          <span className="text-center">
+            {spread > 0 ? fmt(spread, spreadDecimals) : "—"}
+          </span>
+          <span className="text-right">{spreadPct}%</span>
+        </div>
       </div>
     );
   }
@@ -305,6 +313,14 @@ export default function Book({
             />
           ))}
         </div>
+        {/* spread */}
+        <div className="grid grid-cols-3 text-sm text-[#a7a7b7] px-3 py-[5px] bg-white/[0.03] cursor-default">
+          <span>Spread</span>
+          <span className="text-center">
+            {spread > 0 ? fmt(spread, spreadDecimals) : "—"}
+          </span>
+          <span className="text-right">{spreadPct}%</span>
+        </div>
       </div>
     );
   }
@@ -331,6 +347,14 @@ export default function Book({
               flash={flashedPrices.has(level.px)}
             />
           ))}
+        </div>
+        {/* spread */}
+        <div className="grid grid-cols-3 text-sm text-[#a7a7b7] px-3 py-[5px] bg-white/[0.03] cursor-default">
+          <span>Spread</span>
+          <span className="text-center">
+            {spread > 0 ? fmt(spread, spreadDecimals) : "—"}
+          </span>
+          <span className="text-right">{spreadPct}%</span>
         </div>
       </div>
     );
