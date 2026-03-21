@@ -6,7 +6,7 @@ export const BuyOrder = () => (
     fill="none"
     viewBox="0 0 20 20"
   >
-    <path fill="#AEFF00" d="M2 3h6v14H2z"></path>
+    <path fill="var(--color-bid)" d="M2 3h6v14H2z"></path>
     <path
       fill="currentColor"
       fillRule="evenodd"

@@ -6,8 +6,8 @@ export const OrderBook = () => (
     fill="none"
     viewBox="0 0 20 20"
   >
-    <path fill="#F40" d="M2 3h6v6H2z"></path>
-    <path fill="#AEFF00" d="M2 11h6v6H2z"></path>
+    <path fill="var(--color-ask)" d="M2 3h6v6H2z"></path>
+    <path fill="var(--color-bid)" d="M2 11h6v6H2z"></path>
     <path
       fill="currentColor"
       fillRule="evenodd"
