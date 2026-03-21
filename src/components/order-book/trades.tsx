@@ -3,22 +3,8 @@ import { Link } from "@/components/icons/link";
 import { TradesSkeleton } from "./skeleton";
 import type { TradesLayoutMode } from "@/context/trades-layout";
 import cn from "classnames";
-
-function formatTime(ms: number) {
-  return new Date(ms).toLocaleTimeString("en-US", {
-    hour12: false,
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
-}
-
-function fmt(n: string, decimals = 5) {
-  return parseFloat(n).toLocaleString("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: decimals,
-  });
-}
+import { fmt, formatTime } from "@/helpers/formatters";
+import { explorerTxUrl } from "@/helpers/urls";
 
 interface TradesProps {
   trades: Trade[];
@@ -31,19 +17,19 @@ function TradeRow({ trade }: { trade: Trade }) {
   return (
     <div
       className="grid grid-cols-3 items-center text-sm py-[3px] px-3 hover:bg-white/5 cursor-default"
-      onClick={() => window.open(`https://app.hyperliquid.xyz/explorer/tx/${trade.hash}`, '_blank', 'noopener,noreferrer')}
+      onClick={() => window.open(explorerTxUrl(trade.hash), '_blank', 'noopener,noreferrer')}
     >
-      <span style={{ color: isBuy ? "#A1FF00" : "#FF3100" }}>
+      <span style={{ color: isBuy ? "var(--color-bid)" : "var(--color-ask)" }}>
         {fmt(trade.px, 0)}
       </span>
-      <span className="text-right text-[#c8c8d0]">{fmt(trade.sz)}</span>
-      <span className="flex items-center justify-end gap-1 text-[#a7a7b7]">
+      <span className="text-right text-[var(--text-tertiary)]">{fmt(trade.sz)}</span>
+      <span className="flex items-center justify-end gap-1 text-[var(--text-secondary)]">
         {formatTime(trade.time)}
         <a
-          href={`https://app.hyperliquid.xyz/explorer/tx/${trade.hash}`}
+          href={explorerTxUrl(trade.hash)}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[#a7a7b7] hover:text-[#fafafa] transition-colors flex items-center"
+          className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center"
           onClick={(e) => e.stopPropagation()}
         >
           <Link />
@@ -65,11 +51,11 @@ export default function Trades({ trades, coin, layout = 'trades' }: TradesProps)
         "relative grid grid-cols-2",
         "after:absolute after:left-1/2 after:top-0 after:bottom-0 after:w-px after:bg-white/10 after:z-10",
       )}>
-        <div className="grid grid-cols-2 text-sm text-[#a7a7b7] py-2 px-3 border-b border-white/10">
+        <div className="grid grid-cols-2 text-sm text-[var(--text-secondary)] py-2 px-3 border-b border-white/10">
           <span>Price</span>
           <span className="text-right">Size</span>
         </div>
-        <div className="grid grid-cols-2 text-sm text-[#a7a7b7] py-2 px-3 border-b border-white/10">
+        <div className="grid grid-cols-2 text-sm text-[var(--text-secondary)] py-2 px-3 border-b border-white/10">
           <span>Price</span>
           <span className="text-right">Size</span>
         </div>
@@ -85,10 +71,10 @@ export default function Trades({ trades, coin, layout = 'trades' }: TradesProps)
                 <div
                   key={`${trade.hash}-${i}`}
                   className="grid grid-cols-2 text-sm py-[3px] px-3 hover:bg-white/5 cursor-default"
-                  onClick={() => window.open(`https://app.hyperliquid.xyz/explorer/tx/${trade.hash}`, '_blank', 'noopener,noreferrer')}
+                  onClick={() => window.open(explorerTxUrl(trade.hash), '_blank', 'noopener,noreferrer')}
                 >
-                  <span style={{ color: '#A1FF00' }}>{fmt(trade.px, 0)}</span>
-                  <span className="text-right text-[#c8c8d0]">{fmt(trade.sz)}</span>
+                  <span style={{ color: 'var(--color-bid)' }}>{fmt(trade.px, 0)}</span>
+                  <span className="text-right text-[var(--text-tertiary)]">{fmt(trade.sz)}</span>
                 </div>
               ))}
             </div>
@@ -97,10 +83,10 @@ export default function Trades({ trades, coin, layout = 'trades' }: TradesProps)
                 <div
                   key={`${trade.hash}-${i}`}
                   className="grid grid-cols-2 text-sm py-[3px] px-3 hover:bg-white/5 cursor-default"
-                  onClick={() => window.open(`https://app.hyperliquid.xyz/explorer/tx/${trade.hash}`, '_blank', 'noopener,noreferrer')}
+                  onClick={() => window.open(explorerTxUrl(trade.hash), '_blank', 'noopener,noreferrer')}
                 >
-                  <span style={{ color: '#FF3100' }}>{fmt(trade.px, 0)}</span>
-                  <span className="text-right text-[#c8c8d0]">{fmt(trade.sz)}</span>
+                  <span style={{ color: 'var(--color-ask)' }}>{fmt(trade.px, 0)}</span>
+                  <span className="text-right text-[var(--text-tertiary)]">{fmt(trade.sz)}</span>
                 </div>
               ))}
             </div>
@@ -118,7 +104,7 @@ export default function Trades({ trades, coin, layout = 'trades' }: TradesProps)
 
   return (
     <div className="flex flex-col">
-      <div className="grid grid-cols-3 text-sm text-[#a7a7b7] px-3 py-2">
+      <div className="grid grid-cols-3 text-sm text-[var(--text-secondary)] px-3 py-2">
         <span>Price</span>
         <span className="text-right">Size ({coin})</span>
         <span className="text-right">Time</span>
