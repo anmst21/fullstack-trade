@@ -5,19 +5,21 @@ import { usePathname } from 'next/navigation';
 import { useRef, useLayoutEffect, useState } from 'react';
 import { useOrderBookLayout } from '@/context/order-book-layout';
 import { useTradesLayout } from '@/context/trades-layout';
+import { useCoin } from '@/context/coin';
 import LayoutModal from './layout-modal';
 import TradesLayoutModal from '@/components/trades-feed/layout-modal';
 
 const TABS = [
-  { href: '/order-book', label: 'Order Book' },
-  { href: '/trades', label: 'Trades' },
+  { route: 'order-book', label: 'Order Book' },
+  { route: 'trades', label: 'Trades' },
 ];
 
 export default function Tabs() {
   const pathname = usePathname();
+  const { coin } = useCoin();
   const tabRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const [indicator, setIndicator] = useState({ left: 0, width: 0 });
-  const isTradesRoute = pathname === '/trades';
+  const isTradesRoute = pathname.startsWith('/trades');
   const { modalOpen: obModalOpen, setModalOpen: setObModalOpen } = useOrderBookLayout();
   const { modalOpen: trModalOpen, setModalOpen: setTrModalOpen } = useTradesLayout();
   const modalOpen = isTradesRoute ? trModalOpen : obModalOpen;
@@ -25,21 +27,21 @@ export default function Tabs() {
   const dotsRef = useRef<HTMLButtonElement>(null);
 
   useLayoutEffect(() => {
-    const activeIdx = TABS.findIndex((t) => t.href === pathname);
+    const activeIdx = TABS.findIndex((t) => pathname.startsWith(`/${t.route}`));
     const el = tabRefs.current[activeIdx];
     if (!el) return;
     setIndicator({ left: el.offsetLeft, width: el.offsetWidth });
   }, [pathname]);
 
   return (
-    <div className="relative flex items-center border-b border-white/5">
-      {TABS.map(({ href, label }, i) => {
-        const isActive = pathname === href;
+    <div className="relative flex items-center border-y border-white/5">
+      {TABS.map(({ route, label }, i) => {
+        const isActive = pathname.startsWith(`/${route}`);
         return (
           <Link
-            key={href}
+            key={route}
             ref={(el) => { tabRefs.current[i] = el; }}
-            href={href}
+            href={`/${route}/${coin}`}
             className={`px-4 py-3 text-base font-medium transition-colors ${
               isActive ? 'text-[#fafafa]' : 'text-[#a7a7b7] hover:text-[#fafafa]'
             }`}
@@ -51,7 +53,7 @@ export default function Tabs() {
 
       {/* sliding indicator */}
       <span
-        className="absolute bottom-0 h-[2px] bg-[#A1FF00]"
+        className="absolute bottom-0 h-[2px] bg-[#A1FF00] z-10"
         style={{
           left: indicator.left,
           width: indicator.width,
