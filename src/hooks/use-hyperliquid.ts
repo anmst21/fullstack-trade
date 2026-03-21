@@ -23,7 +23,8 @@ export interface Book {
   spread: string | null;
 }
 
-const WS_URL = "wss://api.hyperliquid.xyz/ws";
+import { HYPERLIQUID_WS } from "@/helpers/urls";
+
 const MAX_TRADES = 50;
 const RECONNECT_DELAY = 2000;
 
@@ -42,7 +43,7 @@ export function useHyperliquid(coin = "BTC", nSigFigs?: 2 | 3 | 4 | 5) {
     function connect() {
       if (id !== connId.current) return; // stale — a newer effect has taken over
 
-      const socket = new WebSocket(WS_URL);
+      const socket = new WebSocket(HYPERLIQUID_WS);
       ws.current = socket;
 
       socket.onopen = () => {
@@ -77,8 +78,8 @@ export function useHyperliquid(coin = "BTC", nSigFigs?: 2 | 3 | 4 | 5) {
             const [bids, asks] = msg.data.levels as [Level[], Level[]];
             setBook({ bids, asks, spread: msg.data.spread ?? null });
           }
-        } catch {
-          // ignore malformed frames
+        } catch (err) {
+          console.warn('[useHyperliquid] malformed WebSocket frame', err);
         }
       };
 

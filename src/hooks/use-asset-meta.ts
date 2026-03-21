@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { HYPERLIQUID_API } from '@/helpers/urls';
 
 export interface AssetMeta {
   name: string;
@@ -31,7 +32,7 @@ export function useAssetMeta() {
   useEffect(() => {
     if (cached) return;
 
-    fetch('https://api.hyperliquid.xyz/info', {
+    fetch(HYPERLIQUID_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'metaAndAssetCtxs' }),
@@ -54,7 +55,9 @@ export function useAssetMeta() {
         cached = map;
         setAssets(map);
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.warn('[useAssetMeta] failed to fetch meta', err);
+      });
   }, []);
 
   return assets;

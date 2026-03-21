@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-
-const WS_URL = 'wss://api.hyperliquid.xyz/ws';
+import { HYPERLIQUID_WS } from '@/helpers/urls';
 
 export function useLastPrice(coin: string) {
   const [lastPrice, setLastPrice] = useState<number | undefined>();
@@ -17,7 +16,7 @@ export function useLastPrice(coin: string) {
 
     function connect() {
       if (id !== connId.current) return;
-      const socket = new WebSocket(WS_URL);
+      const socket = new WebSocket(HYPERLIQUID_WS);
       ws.current = socket;
 
       socket.onopen = () => {
@@ -38,7 +37,9 @@ export function useLastPrice(coin: string) {
               return price;
             });
           }
-        } catch {}
+        } catch (err) {
+          console.warn('[useLastPrice] malformed WebSocket frame', err);
+        }
       };
 
       socket.onclose = () => {
