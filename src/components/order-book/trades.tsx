@@ -16,7 +16,7 @@ function TradeRow({ trade }: { trade: Trade }) {
   const isBuy = trade.side === "B";
   return (
     <div
-      className="grid grid-cols-3 items-center text-sm py-[3px] px-3 hover:bg-white/5 cursor-default"
+      className="grid grid-cols-3 items-center text-xs sm:text-sm py-[2px] sm:py-[3px] px-3 hover:bg-white/5 cursor-default"
       onClick={() => window.open(explorerTxUrl(trade.hash), '_blank', 'noopener,noreferrer')}
     >
       <span style={{ color: isBuy ? "var(--color-bid)" : "var(--color-ask)" }}>
@@ -51,11 +51,11 @@ export default function Trades({ trades, coin, layout = 'trades' }: TradesProps)
         "relative grid grid-cols-2",
         "after:absolute after:left-1/2 after:top-0 after:bottom-0 after:w-px after:bg-white/10 after:z-10",
       )}>
-        <div className="grid grid-cols-2 text-sm text-[var(--text-secondary)] py-2 px-3 border-b border-white/10">
+        <div className="grid grid-cols-2 text-xs sm:text-sm text-[var(--text-secondary)] py-1 sm:py-2 px-3 border-b border-white/10">
           <span>Price</span>
           <span className="text-right">Size</span>
         </div>
-        <div className="grid grid-cols-2 text-sm text-[var(--text-secondary)] py-2 px-3 border-b border-white/10">
+        <div className="grid grid-cols-2 text-xs sm:text-sm text-[var(--text-secondary)] py-1 sm:py-2 px-3 border-b border-white/10">
           <span>Price</span>
           <span className="text-right">Size</span>
         </div>
@@ -70,7 +70,7 @@ export default function Trades({ trades, coin, layout = 'trades' }: TradesProps)
               {buys.map((trade, i) => (
                 <div
                   key={`${trade.hash}-${i}`}
-                  className="grid grid-cols-2 text-sm py-[3px] px-3 hover:bg-white/5 cursor-default"
+                  className="grid grid-cols-2 text-xs sm:text-sm py-[2px] sm:py-[3px] px-3 hover:bg-white/5 cursor-default"
                   onClick={() => window.open(explorerTxUrl(trade.hash), '_blank', 'noopener,noreferrer')}
                 >
                   <span style={{ color: 'var(--color-bid)' }}>{fmt(trade.px, 0)}</span>
@@ -82,7 +82,7 @@ export default function Trades({ trades, coin, layout = 'trades' }: TradesProps)
               {sells.map((trade, i) => (
                 <div
                   key={`${trade.hash}-${i}`}
-                  className="grid grid-cols-2 text-sm py-[3px] px-3 hover:bg-white/5 cursor-default"
+                  className="grid grid-cols-2 text-xs sm:text-sm py-[2px] sm:py-[3px] px-3 hover:bg-white/5 cursor-default"
                   onClick={() => window.open(explorerTxUrl(trade.hash), '_blank', 'noopener,noreferrer')}
                 >
                   <span style={{ color: 'var(--color-ask)' }}>{fmt(trade.px, 0)}</span>
@@ -104,7 +104,7 @@ export default function Trades({ trades, coin, layout = 'trades' }: TradesProps)
 
   return (
     <div className="flex flex-col">
-      <div className="grid grid-cols-3 text-sm text-[var(--text-secondary)] px-3 py-2">
+      <div className="grid grid-cols-3 text-xs sm:text-sm text-[var(--text-secondary)] px-3 py-1 sm:py-2">
         <span>Price</span>
         <span className="text-right">Size ({coin})</span>
         <span className="text-right">Time</span>

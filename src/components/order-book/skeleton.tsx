@@ -1,16 +1,19 @@
 import type { LayoutMode } from '@/context/order-book-layout';
-import { ROW_COUNT, DEPTH_ROW_COUNT, ROW_HEIGHT_PX } from '@/helpers/constants';
+import { ROW_COUNT, DEPTH_ROW_COUNT } from '@/helpers/constants';
 
 const DURATION = 1600; // ms, must match CSS animation duration
 const TOTAL_ROWS = ROW_COUNT * 2 + 1; // asks + spread + bids
 const TRADES_ROWS = 24;
+const ROW_H = 'var(--row-h)';
+
+const SPREAD_H = 'var(--spread-h)';
 
 function SpreadSkeleton({ index, total }: { index: number; total: number }) {
   return (
     <div
       className="shimmer"
       style={{
-        height: 30,
+        height: SPREAD_H,
         animationDelay: `-${(index / (total - 1)) * DURATION}ms`,
       }}
     />
@@ -25,7 +28,7 @@ export function TradesSkeleton({ coin: _coin }: { coin: string }) {
           key={i}
           className="shimmer"
           style={{
-            height: ROW_HEIGHT_PX,
+            height: ROW_H,
             animationDelay: `-${(i / (TRADES_ROWS - 1)) * DURATION}ms`,
           }}
         />
@@ -42,7 +45,7 @@ export default function BookSkeleton({ layout = 'order-book' }: BookSkeletonProp
   if (layout === 'depth-view') {
     return (
       <div className="flex flex-col">
-        <div className="grid grid-cols-2 text-sm text-[var(--text-secondary)] py-2 border-b border-white/5">
+        <div className="grid grid-cols-2 text-xs sm:text-sm text-[var(--text-secondary)] py-1 sm:py-2 border-b border-white/5">
           <div className="grid grid-cols-2 px-2">
             <span>Price</span>
             <span className="text-right">Size</span>
@@ -59,7 +62,7 @@ export default function BookSkeleton({ layout = 'order-book' }: BookSkeletonProp
                 key={i}
                 className="shimmer"
                 style={{
-                  height: ROW_HEIGHT_PX,
+                  height: ROW_H,
                   animationDelay: `-${(i / (DEPTH_ROW_COUNT - 1)) * DURATION}ms`,
                 }}
               />
@@ -71,7 +74,7 @@ export default function BookSkeleton({ layout = 'order-book' }: BookSkeletonProp
                 key={i}
                 className="shimmer"
                 style={{
-                  height: ROW_HEIGHT_PX,
+                  height: ROW_H,
                   animationDelay: `-${(i / (DEPTH_ROW_COUNT - 1)) * DURATION}ms`,
                 }}
               />
@@ -85,19 +88,20 @@ export default function BookSkeleton({ layout = 'order-book' }: BookSkeletonProp
 
   const singleSide = layout === 'buy-order' || layout === 'sell-order';
 
-  const rows: { height: number; rowIndex: number }[] = singleSide
-    ? Array.from({ length: DEPTH_ROW_COUNT }, (_, i) => ({ height: ROW_HEIGHT_PX, rowIndex: i }))
-    : [
-        ...Array.from({ length: ROW_COUNT }, (_, i) => ({ height: ROW_HEIGHT_PX, rowIndex: i })),
-        { height: 30, rowIndex: 11 },
-        ...Array.from({ length: ROW_COUNT }, (_, i) => ({ height: ROW_HEIGHT_PX, rowIndex: i + 12 })),
-      ];
-
+  const rowCount = singleSide ? DEPTH_ROW_COUNT : ROW_COUNT;
   const totalRows = singleSide ? DEPTH_ROW_COUNT : TOTAL_ROWS;
+
+  const rows: { height: string | number; rowIndex: number }[] = singleSide
+    ? Array.from({ length: rowCount }, (_, i) => ({ height: ROW_H, rowIndex: i }))
+    : [
+        ...Array.from({ length: ROW_COUNT }, (_, i) => ({ height: ROW_H, rowIndex: i })),
+        { height: SPREAD_H, rowIndex: 11 },
+        ...Array.from({ length: ROW_COUNT }, (_, i) => ({ height: ROW_H, rowIndex: i + 12 })),
+      ];
 
   return (
     <div className="flex flex-col">
-      <div className="grid grid-cols-3 text-sm text-[var(--text-secondary)] px-3 py-2">
+      <div className="grid grid-cols-3 text-xs sm:text-sm text-[var(--text-secondary)] px-3 py-1 sm:py-2">
         <span>Price</span>
         <span className="text-right">Size</span>
         <span className="text-right">Total</span>

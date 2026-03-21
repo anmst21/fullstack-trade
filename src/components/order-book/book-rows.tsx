@@ -45,7 +45,7 @@ export const Row = memo(function Row({
 
   return (
     <div
-      className={cn('relative grid grid-cols-3 text-sm py-[3px] px-3 cursor-default', flash && `flash-row-${side}`)}
+      className={cn('relative grid grid-cols-3 text-xs sm:text-sm py-[2px] sm:py-[3px] px-3 cursor-default', flash && `flash-row-${side}`)}
     >
       <span
         className="absolute top-0 bottom-0 pointer-events-none"
@@ -85,7 +85,7 @@ export const DepthRow = memo(function DepthRow({
 
   return (
     <div
-      className={cn('relative grid grid-cols-2 text-sm py-[3px] px-2 cursor-default', flash && `flash-row-${side}`)}
+      className={cn('relative grid grid-cols-2 text-xs sm:text-sm py-[2px] sm:py-[3px] px-3 cursor-default', flash && `flash-row-${side}`)}
     >
       <span
         className="absolute top-0 bottom-0 pointer-events-none"
@@ -113,7 +113,7 @@ export const DepthRow = memo(function DepthRow({
 
 export function SpreadBar({ spread, spreadDecimals, spreadPct }: { spread: number; spreadDecimals: number; spreadPct: string }) {
   return (
-    <div className="grid grid-cols-3 text-sm text-[var(--text-secondary)] px-3 py-[5px] bg-white/[0.03] cursor-default">
+    <div className="grid grid-cols-3 text-xs sm:text-sm text-[var(--text-secondary)] px-3 py-[3px] sm:py-[5px] bg-white/[0.03] cursor-default">
       <span>Spread</span>
       <span className="text-center">
         {spread > 0 ? fmt(spread, spreadDecimals) : "—"}

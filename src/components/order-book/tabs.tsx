@@ -43,7 +43,7 @@ export default function Tabs() {
             key={route}
             ref={(el) => { tabRefs.current[i] = el; }}
             href={`/${route}/${coin}`}
-            className={cn('px-4 py-3 text-base font-medium transition-colors', isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]')}
+            className={cn('px-4 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors', isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]')}
           >
             {label}
           </Link>
@@ -65,7 +65,7 @@ export default function Tabs() {
         <button
           ref={dotsRef}
           onClick={() => setModalOpen(!modalOpen)}
-          className="px-4 py-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+          className="px-4 py-2 sm:py-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
             <circle cx="8" cy="3" r="1.2" />

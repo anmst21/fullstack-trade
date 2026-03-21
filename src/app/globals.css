@@ -16,6 +16,16 @@
   --color-bid-bar: rgba(161, 255, 0, 0.08);
   --color-ask-bar: rgba(255, 49, 0, 0.08);
   --color-bid-badge: rgba(161, 255, 0, 0.1);
+
+  --row-h: 20px;
+  --spread-h: 22px;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --row-h: 26px;
+    --spread-h: 30px;
+  }
 }
 
 @theme inline {

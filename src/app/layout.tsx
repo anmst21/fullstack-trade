@@ -18,6 +18,10 @@ export const metadata: Metadata = {
   description: "Order Book",
 };
 
+export const viewport = {
+  viewportFit: 'cover' as const,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

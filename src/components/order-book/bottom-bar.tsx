@@ -18,7 +18,7 @@ export default function BottomBar({ coin, asset, onAssetChange, groupIdx, groupO
   const [sigOpen, setSigOpen] = useState(false);
 
   return (
-    <div className="flex items-center justify-between px-3 py-2 text-sm text-[var(--text-secondary)] border-t border-white/5">
+    <div className="flex items-center justify-between px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-[var(--text-secondary)] border-t border-white/5">
 
       {/* grouping dropdown — opens upward */}
       <div className="relative">

@@ -1,6 +1,6 @@
 import { Row, SpreadBar } from "../book-rows";
 import type { LayoutProps } from "../book-rows";
-import { ROW_COUNT, ROW_HEIGHT_PX } from "@/helpers/constants";
+import { ROW_COUNT } from "@/helpers/constants";
 
 export default function OrderBookLayout({
   topAsks,
@@ -19,7 +19,7 @@ export default function OrderBookLayout({
 }: LayoutProps) {
   return (
     <div className="flex flex-col">
-      <div className="grid grid-cols-3 text-sm text-[var(--text-secondary)] px-3 py-2">
+      <div className="grid grid-cols-3 text-xs sm:text-sm text-[var(--text-secondary)] px-3 py-1 sm:py-2">
         <span>Price</span>
         <span className="text-right">Size ({asset})</span>
         <span className="text-right">Total ({asset})</span>
@@ -27,7 +27,7 @@ export default function OrderBookLayout({
 
       <div
         className="flex flex-col justify-end"
-        style={{ height: ROW_COUNT * ROW_HEIGHT_PX }}
+        style={{ height: `calc(var(--row-h) * ${ROW_COUNT})` }}
       >
         {topAsks.map((level, i) => (
           <Row
@@ -45,7 +45,7 @@ export default function OrderBookLayout({
 
       <SpreadBar spread={spread} spreadDecimals={spreadDecimals} spreadPct={spreadPct} />
 
-      <div className="flex flex-col" style={{ height: ROW_COUNT * ROW_HEIGHT_PX }}>
+      <div className="flex flex-col" style={{ height: `calc(var(--row-h) * ${ROW_COUNT})` }}>
         {topBids.map((level, i) => (
           <Row
             key={level.px}
