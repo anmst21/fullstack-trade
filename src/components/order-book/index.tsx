@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useHyperliquid } from "@/hooks/use-hyperliquid";
 import { useCoin } from "@/context/coin";
 import Book from "./book";
@@ -17,17 +17,19 @@ export default function OrderBook() {
   const { book } = useHyperliquid(coin, nSigFigs);
 
   const refPrice = book.asks[0]?.px ?? book.bids[0]?.px;
-  const [lastOptions, setLastOptions] = useState<number[]>([]);
-  const groupOptions = useMemo(() => {
-    if (!refPrice) return lastOptions;
+  const [groupOptions, setGroupOptions] = useState<number[]>(() => {
+    const mag = refPrice ? Math.floor(Math.log10(parseFloat(refPrice))) : 4;
+    const step = parseFloat(Math.pow(10, mag - 4).toPrecision(6));
+    return MULTIPLIERS.map((m) => parseFloat((step * m).toPrecision(6)));
+  });
+
+  if (refPrice) {
     const magnitude = Math.floor(Math.log10(parseFloat(refPrice)));
     const step = parseFloat(Math.pow(10, magnitude - 4).toPrecision(6));
-    return MULTIPLIERS.map((m) => parseFloat((step * m).toPrecision(6)));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refPrice]);
-
-  if (groupOptions.length > 0 && groupOptions !== lastOptions) {
-    setLastOptions(groupOptions);
+    const next = MULTIPLIERS.map((m) => parseFloat((step * m).toPrecision(6)));
+    if (next[0] !== groupOptions[0]) {
+      setGroupOptions(next);
+    }
   }
 
   const group = groupOptions[groupIdx];

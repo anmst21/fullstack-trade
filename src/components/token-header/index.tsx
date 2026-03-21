@@ -16,7 +16,7 @@ export default function TokenHeader() {
   const { coin, meta } = useCoin();
   const { lastPrice, direction } = useLastPrice(coin);
 
-  const lastColorRef = useRef('#fafafa');
+  const lastColorRef = useRef('#A1FF00');
   const lastDirectionRef = useRef<'up' | 'down'>('up');
   if (direction === 'up') { lastColorRef.current = '#A1FF00'; lastDirectionRef.current = 'up'; }
   else if (direction === 'down') { lastColorRef.current = '#FF3100'; lastDirectionRef.current = 'down'; }
@@ -34,9 +34,16 @@ export default function TokenHeader() {
           className="rounded-full border border-white/10 bg-white"
         />
         <div className="flex flex-col items-start">
-          <span className="text-[16px] leading-tight font-bold text-[#fafafa]">
-            {coin}<span className="text-[#a7a7b7] font-normal">/USDC</span>
-          </span>
+          <div className="flex items-center gap-1.5 leading-tight">
+            <span className="text-[16px] font-bold text-[#fafafa] whitespace-nowrap">{coin}<span className="text-[#a7a7b7] font-normal">/USDC</span></span>
+            {meta ? (
+              <span className="text-[10px] font-bold rounded px-1 py-[1px]" style={{ color: '#A1FF00', background: 'rgba(161,255,0,0.1)' }}>
+                {meta.maxLeverage}×
+              </span>
+            ) : (
+              <span className="shimmer rounded w-[24.5px] h-[14.5px]" />
+            )}
+          </div>
           <span className="text-[12px] leading-tight text-[#a7a7b7]">Perpetuals</span>
         </div>
         <span style={{ transform: 'rotate(-90deg)' }}>
@@ -44,26 +51,43 @@ export default function TokenHeader() {
         </span>
       </button>
 
-      <div className="flex items-center gap-3">
-        {lastPrice !== undefined && (
-          <div className="flex items-center gap-1.5" style={{ color }}>
-            <span className="text-[20px] font-bold">${fmtPrice(lastPrice)}</span>
-            <span
-              style={{
-                transform: iconFlip ? 'scaleY(-1)' : 'scaleY(1)',
-                transition: 'transform 0.2s ease-out',
-                display: 'inline-flex',
-              }}
-            >
-              <ChartIcon />
-            </span>
-          </div>
-        )}
-
-        {meta && (
-          <span className="border border-white/10 rounded-lg px-3 py-1 text-[#fafafa] font-bold text-sm">
-            {meta.maxLeverage}×
-          </span>
+      <div className="flex flex-col items-end" style={{ minHeight: 38 }}>
+        {lastPrice !== undefined ? (
+          <>
+            <div className="flex items-center gap-1.5" style={{ color }}>
+              <span className="text-[20px] font-bold leading-none">${fmtPrice(lastPrice)}</span>
+              <span
+                style={{
+                  transform: iconFlip ? 'scaleY(-1)' : 'scaleY(1)',
+                  transition: 'transform 0.2s ease-out',
+                  display: 'inline-flex',
+                }}
+              >
+                <ChartIcon />
+              </span>
+            </div>
+            {meta ? (() => {
+              const vol = parseFloat(meta.dayNtlVlm);
+              if (!vol) return null;
+              const formatted = vol >= 1e9
+                ? `$${(vol / 1e9).toFixed(2)}B`
+                : vol >= 1e6
+                  ? `$${(vol / 1e6).toFixed(2)}M`
+                  : `$${vol.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+              return (
+                <span className="text-[12px] text-[#a7a7b7]">
+                  Vol {formatted}
+                </span>
+              );
+            })() : (
+              <span className="shimmer rounded w-[70px] h-[14px] mt-1" />
+            )}
+          </>
+        ) : (
+          <>
+            <span className="shimmer rounded-md w-[120px] h-[20px]" />
+            <span className="shimmer rounded w-[70px] h-[14px] mt-1" />
+          </>
         )}
       </div>
     </div>
