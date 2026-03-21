@@ -1,3 +1,5 @@
+'use client';
+
 import OrderBook from '@/components/order-book';
 
 export default function OrderBookPage() {

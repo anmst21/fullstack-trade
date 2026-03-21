@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState } from 'react';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 
 export type LayoutMode = 'order-book' | 'depth-view' | 'buy-order' | 'sell-order';
 
@@ -14,7 +15,7 @@ interface OrderBookLayoutContextValue {
 const OrderBookLayoutContext = createContext<OrderBookLayoutContextValue | null>(null);
 
 export function OrderBookLayoutProvider({ children }: { children: React.ReactNode }) {
-  const [layout, setLayout] = useState<LayoutMode>('order-book');
+  const [layout, setLayout] = useLocalStorage<LayoutMode>('ob-layout', 'order-book');
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
