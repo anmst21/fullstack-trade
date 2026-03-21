@@ -1,55 +1,63 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useCoin } from '@/context/coin';
 import { ChevDown, ChartIcon } from '@/components/icons';
 import { useLastPrice } from '@/hooks/use-last-price';
-
-function fmtPrice(n: number) {
-  return n.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: n < 1 ? 6 : 2,
-  });
-}
+import { fmtPrice } from '@/helpers/formatters';
+import CoinModal from './coin-modal';
+import cn from 'classnames';
+import { coinIconUrl } from '@/helpers/urls';
 
 export default function TokenHeader() {
   const { coin, meta } = useCoin();
   const { lastPrice, direction } = useLastPrice(coin);
+  const [modalOpen, setModalOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
-  const lastColorRef = useRef('#A1FF00');
+  const lastColorRef = useRef('var(--color-bid)');
   const lastDirectionRef = useRef<'up' | 'down'>('up');
-  if (direction === 'up') { lastColorRef.current = '#A1FF00'; lastDirectionRef.current = 'up'; }
-  else if (direction === 'down') { lastColorRef.current = '#FF3100'; lastDirectionRef.current = 'down'; }
+  if (direction === 'up') { lastColorRef.current = 'var(--color-bid)'; lastDirectionRef.current = 'up'; }
+  else if (direction === 'down') { lastColorRef.current = 'var(--color-ask)'; lastDirectionRef.current = 'down'; }
   const color = lastColorRef.current;
   const iconFlip = lastDirectionRef.current === 'down';
 
   return (
     <div className="flex items-center justify-between px-4 py-3">
-      <button className="flex items-center gap-3 border border-white/10 rounded-lg px-3 py-2 hover:bg-white/5 transition-colors cursor-pointer">
+      <button
+        ref={buttonRef}
+        onClick={() => setModalOpen((v) => !v)}
+        className={cn(
+          'token-btn flex items-center gap-3 border border-white/10 rounded-lg px-3 py-2 transition-colors cursor-pointer',
+          modalOpen ? 'active bg-white/5' : 'hover:bg-white/5',
+        )}
+      >
         <img
-          src={`https://app.hyperliquid.xyz/coins/${coin}.svg`}
+          src={coinIconUrl(coin)}
           alt={coin}
           width={30}
           height={30}
-          className="rounded-full border border-white/10 bg-white"
+          className={`rounded-full border ${coin === 'HYPE' ? 'border-white bg-black' : 'border-white/10 bg-white'}`}
         />
         <div className="flex flex-col items-start">
           <div className="flex items-center gap-1.5 leading-tight">
-            <span className="text-[16px] font-bold text-[#fafafa] whitespace-nowrap">{coin}<span className="text-[#a7a7b7] font-normal">/USDC</span></span>
+            <span className="text-[16px] font-bold text-[var(--text-primary)] whitespace-nowrap">{coin}<span className="text-[var(--text-secondary)] font-normal">/USDC</span></span>
             {meta ? (
-              <span className="text-[10px] font-bold rounded px-1 py-[1px]" style={{ color: '#A1FF00', background: 'rgba(161,255,0,0.1)' }}>
+              <span className="text-[10px] font-bold rounded px-1 py-[1px]" style={{ color: 'var(--color-bid)', background: 'var(--color-bid-badge)' }}>
                 {meta.maxLeverage}×
               </span>
             ) : (
               <span className="shimmer rounded w-[24.5px] h-[14.5px]" />
             )}
           </div>
-          <span className="text-[12px] leading-tight text-[#a7a7b7]">Perpetuals</span>
+          <span className="text-[12px] leading-tight text-[var(--text-secondary)]">Perpetuals</span>
         </div>
-        <span style={{ transform: 'rotate(-90deg)' }}>
+        <span className="chev text-[var(--text-secondary)]">
           <ChevDown />
         </span>
       </button>
+
+      <CoinModal triggerRef={buttonRef} open={modalOpen} onClose={() => setModalOpen(false)} />
 
       <div className="flex flex-col items-end" style={{ minHeight: 38 }}>
         {lastPrice !== undefined ? (
@@ -75,7 +83,7 @@ export default function TokenHeader() {
                   ? `$${(vol / 1e6).toFixed(2)}M`
                   : `$${vol.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
               return (
-                <span className="text-[12px] text-[#a7a7b7]">
+                <span className="text-[12px] text-[var(--text-secondary)]">
                   Vol {formatted}
                 </span>
               );
