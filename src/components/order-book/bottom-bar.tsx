@@ -27,7 +27,7 @@ export default function BottomBar({ coin, asset, onAssetChange, groupIdx, groupO
       <div className="relative">
         <button
           onClick={() => setSigOpen((v) => !v)}
-          className="flex items-center gap-3 hover:text-[#fafafa] transition-colors font-mono"
+          className="flex items-center gap-3 hover:text-[#fafafa] transition-colors font-mono cursor-pointer"
         >
           {fmtGroup(groupOptions[groupIdx])}
           <span style={{ transition: 'transform 0.2s', transform: sigOpen ? 'rotate(0deg)' : 'rotate(180deg)', display: 'inline-flex' }}>
@@ -44,7 +44,7 @@ export default function BottomBar({ coin, asset, onAssetChange, groupIdx, groupO
                   key={opt}
                   onClick={() => { onGroupIdxChange(i); setSigOpen(false); }}
                   className={[
-                    'w-full text-left px-4 py-[7px] text-sm font-mono transition-colors',
+                    'w-full text-left px-4 py-[7px] text-sm font-mono transition-colors cursor-pointer',
                     i === groupIdx ? 'text-[#fafafa]' : 'text-[#a7a7b7] hover:text-[#fafafa] hover:bg-white/5',
                   ].join(' ')}
                 >
@@ -60,7 +60,7 @@ export default function BottomBar({ coin, asset, onAssetChange, groupIdx, groupO
       <div className="flex items-center gap-2 font-mono">
         <button
           onClick={() => onAssetChange('USDC')}
-          className={`transition-colors ${asset === 'USDC' ? 'text-[#fafafa] font-medium' : 'hover:text-[#fafafa]'}`}
+          className={`transition-colors cursor-pointer ${asset === 'USDC' ? 'text-[#fafafa] font-medium' : 'hover:text-[#fafafa]'}`}
         >
           USDC
         </button>
