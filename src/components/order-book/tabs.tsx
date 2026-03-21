@@ -3,6 +3,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRef, useLayoutEffect, useState } from 'react';
+import { useOrderBookLayout } from '@/context/order-book-layout';
+import { useTradesLayout } from '@/context/trades-layout';
+import LayoutModal from './layout-modal';
+import TradesLayoutModal from '@/components/trades-feed/layout-modal';
 
 const TABS = [
   { href: '/order-book', label: 'Order Book' },
@@ -13,6 +17,12 @@ export default function Tabs() {
   const pathname = usePathname();
   const tabRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const [indicator, setIndicator] = useState({ left: 0, width: 0 });
+  const isTradesRoute = pathname === '/trades';
+  const { modalOpen: obModalOpen, setModalOpen: setObModalOpen } = useOrderBookLayout();
+  const { modalOpen: trModalOpen, setModalOpen: setTrModalOpen } = useTradesLayout();
+  const modalOpen = isTradesRoute ? trModalOpen : obModalOpen;
+  const setModalOpen = isTradesRoute ? setTrModalOpen : setObModalOpen;
+  const dotsRef = useRef<HTMLButtonElement>(null);
 
   useLayoutEffect(() => {
     const activeIdx = TABS.findIndex((t) => t.href === pathname);
@@ -49,13 +59,24 @@ export default function Tabs() {
         }}
       />
 
-      <button className="ml-auto px-4 py-3 text-[#a7a7b7] hover:text-[#fafafa] transition-colors">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <circle cx="8" cy="3" r="1.2" />
-          <circle cx="8" cy="8" r="1.2" />
-          <circle cx="8" cy="13" r="1.2" />
-        </svg>
-      </button>
+      {/* 3-dots button + modal */}
+      <div className="ml-auto">
+        <button
+          ref={dotsRef}
+          onClick={() => setModalOpen(!modalOpen)}
+          className="px-4 py-3 text-[#a7a7b7] hover:text-[#fafafa] transition-colors cursor-pointer"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <circle cx="8" cy="3" r="1.2" />
+            <circle cx="8" cy="8" r="1.2" />
+            <circle cx="8" cy="13" r="1.2" />
+          </svg>
+        </button>
+        {isTradesRoute
+          ? <TradesLayoutModal triggerRef={dotsRef} />
+          : <LayoutModal triggerRef={dotsRef} />
+        }
+      </div>
     </div>
   );
 }
