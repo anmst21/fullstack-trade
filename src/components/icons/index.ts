@@ -5,4 +5,15 @@ import { BuyOrder } from "./buy-order";
 import { DepthView } from "./depth-view";
 import { OrderBook } from "./order-book";
 import { SellOrder } from "./sell-order";
-export { Logo, Link, ChevDown, BuyOrder, OrderBook, DepthView, SellOrder };
+import { ChartIcon } from "./chart-icon";
+
+export {
+  ChartIcon,
+  Logo,
+  Link,
+  ChevDown,
+  BuyOrder,
+  OrderBook,
+  DepthView,
+  SellOrder,
+};
