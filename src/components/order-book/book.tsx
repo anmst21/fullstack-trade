@@ -1,139 +1,18 @@
 "use client";
 
-import { memo, useEffect, useMemo, useRef, useState } from "react";
-import type { Book as BookData, Level } from "@/hooks/use-hyperliquid";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { Book as BookData } from "@/hooks/use-hyperliquid";
 import BookSkeleton from "./skeleton";
 import { useOrderBookLayout } from "@/context/order-book-layout";
-import cn from "classnames";
-
-const ROW_COUNT = 11;
-
-function fmt(n: number, decimals = 2) {
-  return n.toLocaleString("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: decimals,
-  });
-}
-
-function applyGrouping(
-  levels: Level[],
-  group: number,
-  side: "bid" | "ask",
-): Level[] {
-  if (group <= 0) return levels;
-  const buckets = new Map<number, number>();
-  for (const level of levels) {
-    const price = parseFloat(level.px);
-    const size = parseFloat(level.sz);
-    const raw =
-      side === "bid"
-        ? Math.floor(price / group) * group
-        : Math.ceil(price / group) * group;
-    const bucket = parseFloat(raw.toPrecision(10));
-    buckets.set(bucket, (buckets.get(bucket) || 0) + size);
-  }
-  return Array.from(buckets.entries()).map(([px, sz]) => ({
-    px: String(px),
-    sz: String(sz),
-    n: 1,
-  }));
-}
-
-interface RowProps {
-  px: string;
-  sz: number;
-  total: number;
-  maxTotal: number;
-  side: "bid" | "ask";
-  szDecimals: number;
-  flash: boolean;
-  barAlign?: "left" | "right";
-}
-
-const Row = memo(function Row({
-  px,
-  sz,
-  total,
-  maxTotal,
-  side,
-  szDecimals,
-  flash,
-  barAlign = "left",
-}: RowProps) {
-  const pct = maxTotal > 0 ? (total / maxTotal) * 100 : 0;
-  const isBid = side === "bid";
-
-  return (
-    <div
-      className={`relative grid grid-cols-3 text-sm py-[3px] px-3 cursor-default${flash ? ` flash-row-${side}` : ""}`}
-    >
-      <span
-        className="absolute top-0 bottom-0 pointer-events-none"
-        style={{
-          [barAlign]: 0,
-          width: `${pct}%`,
-          background: isBid ? "rgba(161,255,0,0.08)" : "rgba(255,49,0,0.08)",
-          transition: "width 200ms ease-out",
-        }}
-      />
-      <span
-        className="hover:font-semibold"
-        style={{ color: isBid ? "#A1FF00" : "#FF3100" }}
-      >
-        {fmt(parseFloat(px), 0)}
-      </span>
-      <span className="text-right text-[#c8c8d0] hover:font-semibold">
-        {fmt(sz, szDecimals)}
-      </span>
-      <span className="text-right text-[#c8c8d0] hover:font-semibold">
-        {fmt(total, szDecimals)}
-      </span>
-    </div>
-  );
-});
-
-// Compact row for depth-view (2-col layout: price + size only)
-const DepthRow = memo(function DepthRow({
-  px,
-  sz,
-  maxTotal,
-  side,
-  szDecimals,
-  flash,
-}: Omit<RowProps, "total" | "barAlign">) {
-  const pct = maxTotal > 0 ? (sz / maxTotal) * 100 : 0;
-  const isBid = side === "bid";
-
-  return (
-    <div
-      className={`relative grid grid-cols-2 text-sm py-[3px] px-2 cursor-default${flash ? ` flash-row-${side}` : ""}`}
-    >
-      <span
-        className="absolute top-0 bottom-0 pointer-events-none"
-        style={{
-          [isBid ? "left" : "right"]: 0,
-          width: `${pct}%`,
-          background: isBid ? "rgba(161,255,0,0.08)" : "rgba(255,49,0,0.08)",
-          transition: "width 200ms ease-out",
-        }}
-      />
-      <span
-        className="hover:font-semibold"
-        style={{ color: isBid ? "#A1FF00" : "#FF3100" }}
-      >
-        {fmt(parseFloat(px), 0)}
-      </span>
-      <span
-        className="text-right text-[#c8c8d0] hover:font-semibold"
-      >
-        {fmt(sz, szDecimals)}
-      </span>
-    </div>
-  );
-});
+import { applyGrouping } from "@/helpers/orderbook";
+import { ROW_COUNT, DEPTH_ROW_COUNT } from "@/helpers/constants";
+import type { LayoutProps } from "./book-rows";
+import OrderBookLayout from "./layouts/order-book-layout";
+import DepthViewLayout from "./layouts/depth-view-layout";
+import BuyOrderLayout from "./layouts/buy-order-layout";
+import SellOrderLayout from "./layouts/sell-order-layout";
 
 interface BookProps extends BookData {
-  coin: string;
   asset: string;
   group: number;
 }
@@ -144,13 +23,12 @@ export default function Book({
   spread: apiSpread,
   asset,
   group,
-  coin,
 }: BookProps) {
   const { layout } = useOrderBookLayout();
   const isLoading = bids.length === 0 && asks.length === 0;
   const isUSDC = asset === "USDC";
   const szDecimals = isUSDC ? 0 : 5;
-  const rowCount = layout === "order-book" ? ROW_COUNT : 20;
+  const rowCount = layout === "order-book" ? ROW_COUNT : DEPTH_ROW_COUNT;
 
   const topAsks = useMemo(
     () =>
@@ -223,6 +101,8 @@ export default function Book({
     }
   }, [topAsks, topBids]);
 
+  if (isLoading) return <BookSkeleton layout={layout} />;
+
   const spread = apiSpread ? parseFloat(apiSpread) : 0;
   const spreadDecimals = spread > 0 && spread < 1 ? 1 : 0;
   const lowestAsk = topAsks[topAsks.length - 1]
@@ -231,188 +111,24 @@ export default function Book({
   const spreadPct =
     lowestAsk > 0 ? ((spread / lowestAsk) * 100).toFixed(3) : "0.000";
 
-  if (isLoading) return <BookSkeleton asset={asset} coin={coin} layout={layout} />;
+  const layoutProps: LayoutProps = {
+    topAsks,
+    topBids,
+    askDisplaySizes,
+    bidDisplaySizes,
+    askTotals,
+    bidTotals,
+    maxTotal,
+    szDecimals,
+    flashedPrices,
+    spread,
+    spreadDecimals,
+    spreadPct,
+    asset,
+  };
 
-  // ── Depth View ────────────────────────────────────────────────────────────
-  if (layout === "depth-view") {
-    return (
-      <div className="flex flex-col">
-        <div className={cn(
-          "relative grid grid-cols-2",
-          "after:absolute after:left-1/2 after:top-0 after:bottom-0 after:w-px after:bg-white/10 after:z-10",
-        )}>
-          <div className="grid grid-cols-2 text-sm text-[#a7a7b7] py-2 px-2 border-b border-white/10">
-            <span>Price</span>
-            <span className="text-right">Size</span>
-          </div>
-          <div className="grid grid-cols-2 text-sm text-[#a7a7b7] py-2 px-2 border-b border-white/10">
-            <span>Price</span>
-            <span className="text-right">Size</span>
-          </div>
-          {/* Asks — price DESC (lowest at bottom), bar from right */}
-          <div className="flex flex-col" style={{ minHeight: 20 * 26 }}>
-            {topAsks.map((level, i) => (
-              <DepthRow
-                key={level.px}
-                px={level.px}
-                sz={askDisplaySizes[i]}
-                maxTotal={maxTotal}
-                side="ask"
-                szDecimals={szDecimals}
-                flash={flashedPrices.has(level.px)}
-              />
-            ))}
-          </div>
-          {/* Bids — price DESC (highest at top), bar from left */}
-          <div className="flex flex-col" style={{ minHeight: 20 * 26 }}>
-            {topBids.map((level, i) => (
-              <DepthRow
-                key={level.px}
-                px={level.px}
-                sz={bidDisplaySizes[i]}
-                maxTotal={maxTotal}
-                side="bid"
-                szDecimals={szDecimals}
-                flash={flashedPrices.has(level.px)}
-              />
-            ))}
-          </div>
-        </div>
-        {/* spread */}
-        <div className="grid grid-cols-3 text-sm text-[#a7a7b7] px-3 py-[5px] bg-white/[0.03] cursor-default">
-          <span>Spread</span>
-          <span className="text-center">
-            {spread > 0 ? fmt(spread, spreadDecimals) : "—"}
-          </span>
-          <span className="text-right">{spreadPct}%</span>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Buy Order (bids only) ─────────────────────────────────────────────────
-  if (layout === "buy-order") {
-    return (
-      <div className="flex flex-col">
-        <div className="grid grid-cols-3 text-sm text-[#a7a7b7] px-3 py-2">
-          <span>Price</span>
-          <span className="text-right">Size ({asset})</span>
-          <span className="text-right">Total ({asset})</span>
-        </div>
-        <div className="flex flex-col" style={{ minHeight: 20 * 26 }}>
-          {topBids.map((level, i) => (
-            <Row
-              key={level.px}
-              px={level.px}
-              sz={bidDisplaySizes[i]}
-              total={bidTotals[i]}
-              maxTotal={maxTotal}
-              side="bid"
-              szDecimals={szDecimals}
-              flash={flashedPrices.has(level.px)}
-            />
-          ))}
-        </div>
-        {/* spread */}
-        <div className="grid grid-cols-3 text-sm text-[#a7a7b7] px-3 py-[5px] bg-white/[0.03] cursor-default">
-          <span>Spread</span>
-          <span className="text-center">
-            {spread > 0 ? fmt(spread, spreadDecimals) : "—"}
-          </span>
-          <span className="text-right">{spreadPct}%</span>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Sell Order (asks only) ────────────────────────────────────────────────
-  if (layout === "sell-order") {
-    return (
-      <div className="flex flex-col">
-        <div className="grid grid-cols-3 text-sm text-[#a7a7b7] px-3 py-2">
-          <span>Price</span>
-          <span className="text-right">Size ({asset})</span>
-          <span className="text-right">Total ({asset})</span>
-        </div>
-        <div className="flex flex-col" style={{ minHeight: 20 * 26 }}>
-          {topAsks.map((level, i) => (
-            <Row
-              key={level.px}
-              px={level.px}
-              sz={askDisplaySizes[i]}
-              total={askTotals[i]}
-              maxTotal={maxTotal}
-              side="ask"
-              szDecimals={szDecimals}
-              flash={flashedPrices.has(level.px)}
-            />
-          ))}
-        </div>
-        {/* spread */}
-        <div className="grid grid-cols-3 text-sm text-[#a7a7b7] px-3 py-[5px] bg-white/[0.03] cursor-default">
-          <span>Spread</span>
-          <span className="text-center">
-            {spread > 0 ? fmt(spread, spreadDecimals) : "—"}
-          </span>
-          <span className="text-right">{spreadPct}%</span>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Order Book (default) ──────────────────────────────────────────────────
-  return (
-    <div className="flex flex-col">
-      {/* column headers */}
-      <div className="grid grid-cols-3 text-sm text-[#a7a7b7] px-3 py-2">
-        <span>Price</span>
-        <span className="text-right">Size ({asset})</span>
-        <span className="text-right">Total ({asset})</span>
-      </div>
-
-      {/* asks — fixed height, rows pinned to bottom so spread stays centered */}
-      <div
-        className="flex flex-col justify-end"
-        style={{ height: ROW_COUNT * 26 }}
-      >
-        {topAsks.map((level, i) => (
-          <Row
-            key={level.px}
-            px={level.px}
-            sz={askDisplaySizes[i]}
-            total={askTotals[i]}
-            maxTotal={maxTotal}
-            side="ask"
-            szDecimals={szDecimals}
-            flash={flashedPrices.has(level.px)}
-          />
-        ))}
-      </div>
-
-      {/* spread */}
-      <div className="grid grid-cols-3 text-sm text-[#a7a7b7] px-3 py-[5px] bg-white/[0.03] cursor-default">
-        <span>Spread</span>
-        <span className="text-center">
-          {spread > 0 ? fmt(spread, spreadDecimals) : "—"}
-        </span>
-        <span className="text-right">{spreadPct}%</span>
-      </div>
-
-      {/* bids — fixed height, rows from top */}
-      <div className="flex flex-col" style={{ height: ROW_COUNT * 26 }}>
-        {topBids.map((level, i) => (
-          <Row
-            key={level.px}
-            px={level.px}
-            sz={bidDisplaySizes[i]}
-            total={bidTotals[i]}
-            maxTotal={maxTotal}
-            side="bid"
-            szDecimals={szDecimals}
-            flash={flashedPrices.has(level.px)}
-          />
-        ))}
-      </div>
-    </div>
-  );
+  if (layout === "depth-view") return <DepthViewLayout {...layoutProps} />;
+  if (layout === "buy-order") return <BuyOrderLayout {...layoutProps} />;
+  if (layout === "sell-order") return <SellOrderLayout {...layoutProps} />;
+  return <OrderBookLayout {...layoutProps} />;
 }

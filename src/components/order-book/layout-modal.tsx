@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import cn from 'classnames';
 import { createPortal } from 'react-dom';
 import { OrderBook, DepthView, BuyOrder, SellOrder } from '@/components/icons';
 import { useOrderBookLayout, type LayoutMode } from '@/context/order-book-layout';
@@ -35,7 +36,7 @@ export default function LayoutModal({ triggerRef }: Props) {
     <>
       <div className="fixed inset-0 z-40" onClick={() => setModalOpen(false)} />
       <div
-        className="fixed z-50 rounded-xl bg-[#1c1c21] border border-white/10 shadow-xl p-1"
+        className="fixed z-50 rounded-xl bg-[var(--color-surface-modal)] border border-white/10 shadow-xl p-1"
         style={{ top: pos.top, right: pos.right }}
       >
         <div className="grid grid-cols-2 gap-1">
@@ -45,11 +46,7 @@ export default function LayoutModal({ triggerRef }: Props) {
               <button
                 key={id}
                 onClick={() => { setLayout(id); setModalOpen(false); }}
-                className={`flex flex-col items-center gap-2 px-5 py-3 rounded-[8px] text-xs font-mono transition-colors cursor-pointer ${
-                  isActive
-                    ? 'bg-white/10 text-[#fafafa]'
-                    : 'text-[#a7a7b7] hover:bg-white/5 hover:text-[#fafafa]'
-                }`}
+                className={cn('flex flex-col items-center gap-2 px-5 py-3 rounded-[8px] text-xs font-mono transition-colors cursor-pointer', isActive ? 'bg-white/10 text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)]')}
               >
                 <Icon />
                 {label}

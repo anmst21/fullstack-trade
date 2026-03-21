@@ -6,6 +6,7 @@ import { useRef, useLayoutEffect, useState } from 'react';
 import { useOrderBookLayout } from '@/context/order-book-layout';
 import { useTradesLayout } from '@/context/trades-layout';
 import { useCoin } from '@/context/coin';
+import cn from 'classnames';
 import LayoutModal from './layout-modal';
 import TradesLayoutModal from '@/components/trades-feed/layout-modal';
 
@@ -42,9 +43,7 @@ export default function Tabs() {
             key={route}
             ref={(el) => { tabRefs.current[i] = el; }}
             href={`/${route}/${coin}`}
-            className={`px-4 py-3 text-base font-medium transition-colors ${
-              isActive ? 'text-[#fafafa]' : 'text-[#a7a7b7] hover:text-[#fafafa]'
-            }`}
+            className={cn('px-4 py-3 text-base font-medium transition-colors', isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]')}
           >
             {label}
           </Link>
@@ -53,7 +52,7 @@ export default function Tabs() {
 
       {/* sliding indicator */}
       <span
-        className="absolute bottom-0 h-[2px] bg-[#A1FF00] z-10"
+        className="absolute bottom-0 h-[2px] bg-[var(--color-bid)] z-10"
         style={{
           left: indicator.left,
           width: indicator.width,
@@ -66,7 +65,7 @@ export default function Tabs() {
         <button
           ref={dotsRef}
           onClick={() => setModalOpen(!modalOpen)}
-          className="px-4 py-3 text-[#a7a7b7] hover:text-[#fafafa] transition-colors cursor-pointer"
+          className="px-4 py-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
             <circle cx="8" cy="3" r="1.2" />

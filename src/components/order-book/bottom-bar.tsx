@@ -2,11 +2,8 @@
 
 import { useState } from 'react';
 import { ChevDown } from '@/components/icons/chev-down';
-
-function fmtGroup(n: number): string {
-  if (n < 1) return n.toString();
-  return n.toLocaleString('en-US');
-}
+import { fmtGroup } from '@/helpers/formatters';
+import cn from 'classnames';
 
 interface BottomBarProps {
   coin: string;
@@ -21,13 +18,13 @@ export default function BottomBar({ coin, asset, onAssetChange, groupIdx, groupO
   const [sigOpen, setSigOpen] = useState(false);
 
   return (
-    <div className="flex items-center justify-between px-3 py-2 text-sm text-[#a7a7b7] border-t border-white/5">
+    <div className="flex items-center justify-between px-3 py-2 text-sm text-[var(--text-secondary)] border-t border-white/5">
 
       {/* grouping dropdown — opens upward */}
       <div className="relative">
         <button
           onClick={() => setSigOpen((v) => !v)}
-          className="flex items-center gap-3 hover:text-[#fafafa] transition-colors font-mono cursor-pointer"
+          className="flex items-center gap-3 hover:text-[var(--text-primary)] transition-colors font-mono cursor-pointer"
         >
           {fmtGroup(groupOptions[groupIdx])}
           <span style={{ transition: 'transform 0.2s', transform: sigOpen ? 'rotate(0deg)' : 'rotate(180deg)', display: 'inline-flex' }}>
@@ -38,15 +35,15 @@ export default function BottomBar({ coin, asset, onAssetChange, groupIdx, groupO
         {sigOpen && (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setSigOpen(false)} />
-            <div className="absolute left-0 bottom-full mb-1 z-20 min-w-[80px] rounded-lg bg-[#1c1c21] border border-white/10 shadow-xl overflow-hidden">
+            <div className="absolute left-0 bottom-full mb-1 z-20 min-w-[80px] rounded-lg bg-[var(--color-surface-modal)] border border-white/10 shadow-xl overflow-hidden">
               {groupOptions.map((opt, i) => (
                 <button
                   key={opt}
                   onClick={() => { onGroupIdxChange(i); setSigOpen(false); }}
-                  className={[
+                  className={cn(
                     'w-full text-left px-4 py-[7px] text-sm font-mono transition-colors cursor-pointer',
-                    i === groupIdx ? 'text-[#fafafa]' : 'text-[#a7a7b7] hover:text-[#fafafa] hover:bg-white/5',
-                  ].join(' ')}
+                    i === groupIdx ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5',
+                  )}
                 >
                   {fmtGroup(opt)}
                 </button>
@@ -60,13 +57,13 @@ export default function BottomBar({ coin, asset, onAssetChange, groupIdx, groupO
       <div className="flex items-center gap-2 font-mono">
         <button
           onClick={() => onAssetChange('USDC')}
-          className={`transition-colors cursor-pointer ${asset === 'USDC' ? 'text-[#fafafa] font-medium' : 'hover:text-[#fafafa]'}`}
+          className={cn('transition-colors cursor-pointer', asset === 'USDC' ? 'text-[var(--text-primary)] font-medium' : 'hover:text-[var(--text-primary)]')}
         >
           USDC
         </button>
         <button
           onClick={() => onAssetChange(coin)}
-          className={`transition-colors ${asset === coin ? 'text-[#fafafa] font-medium' : 'hover:text-[#fafafa]'}`}
+          className={cn('transition-colors', asset === coin ? 'text-[var(--text-primary)] font-medium' : 'hover:text-[var(--text-primary)]')}
         >
           {coin}
         </button>
