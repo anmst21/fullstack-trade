@@ -12,7 +12,7 @@ const NSIGFIGS_BY_IDX = [5, 5, 5, 4, 3, 2] as const;
 
 export default function OrderBook() {
   const { coin } = useCoin();
-  const [groupIdx, setGroupIdx] = useLocalStorage('ob-group-idx', 0);
+  const [groupIdx, setGroupIdx] = useState(0);
   const [asset, setAsset] = useLocalStorage<string>('ob-asset', coin);
   const nSigFigs = NSIGFIGS_BY_IDX[groupIdx];
   const { book } = useHyperliquid(coin, nSigFigs);
