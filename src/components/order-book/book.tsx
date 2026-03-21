@@ -250,7 +250,7 @@ export default function Book({
             <span className="text-right">Size</span>
           </div>
           {/* Asks — price DESC (lowest at bottom), bar from right */}
-          <div className="flex flex-col justify-end">
+          <div className="flex flex-col" style={{ minHeight: 20 * 26 }}>
             {topAsks.map((level, i) => (
               <DepthRow
                 key={level.px}
@@ -264,7 +264,7 @@ export default function Book({
             ))}
           </div>
           {/* Bids — price DESC (highest at top), bar from left */}
-          <div className="flex flex-col">
+          <div className="flex flex-col" style={{ minHeight: 20 * 26 }}>
             {topBids.map((level, i) => (
               <DepthRow
                 key={level.px}
@@ -299,7 +299,7 @@ export default function Book({
           <span className="text-right">Size ({asset})</span>
           <span className="text-right">Total ({asset})</span>
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col" style={{ minHeight: 20 * 26 }}>
           {topBids.map((level, i) => (
             <Row
               key={level.px}
@@ -334,7 +334,7 @@ export default function Book({
           <span className="text-right">Size ({asset})</span>
           <span className="text-right">Total ({asset})</span>
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col" style={{ minHeight: 20 * 26 }}>
           {topAsks.map((level, i) => (
             <Row
               key={level.px}
