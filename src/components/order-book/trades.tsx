@@ -2,6 +2,7 @@ import type { Trade } from "@/hooks/use-hyperliquid";
 import { Link } from "@/components/icons/link";
 import { TradesSkeleton } from "./skeleton";
 import type { TradesLayoutMode } from "@/context/trades-layout";
+import cn from "classnames";
 
 function formatTime(ms: number) {
   return new Date(ms).toLocaleTimeString("en-US", {
@@ -14,7 +15,7 @@ function formatTime(ms: number) {
 
 function fmt(n: string, decimals = 5) {
   return parseFloat(n).toLocaleString("en-US", {
-    minimumFractionDigits: decimals,
+    minimumFractionDigits: 0,
     maximumFractionDigits: decimals,
   });
 }
@@ -60,22 +61,23 @@ export default function Trades({ trades, coin, layout = 'trades' }: TradesProps)
     const buys = trades.filter((t) => t.side === 'B');
     const sells = trades.filter((t) => t.side === 'A');
     return (
-      <div className="flex flex-col">
-        <div className="grid grid-cols-2 text-sm text-[#a7a7b7] py-2 border-b border-white/5">
-          <div className="grid grid-cols-2 px-3">
-            <span>Price</span>
-            <span className="text-right">Size</span>
-          </div>
-          <div className="grid grid-cols-2 px-3 border-l border-white/5">
-            <span>Price</span>
-            <span className="text-right">Size</span>
-          </div>
+      <div className={cn(
+        "relative grid grid-cols-2",
+        "after:absolute after:left-1/2 after:top-0 after:bottom-0 after:w-px after:bg-white/10 after:z-10",
+      )}>
+        <div className="grid grid-cols-2 text-sm text-[#a7a7b7] py-2 px-3 border-b border-white/10">
+          <span>Price</span>
+          <span className="text-right">Size</span>
+        </div>
+        <div className="grid grid-cols-2 text-sm text-[#a7a7b7] py-2 px-3 border-b border-white/10">
+          <span>Price</span>
+          <span className="text-right">Size</span>
         </div>
         {isEmpty ? (
           <TradesSkeleton coin={coin} />
         ) : (
-          <div className="grid grid-cols-2">
-            <div className="flex flex-col border-r border-white/5">
+          <>
+            <div className="flex flex-col">
               {buys.map((trade, i) => (
                 <div
                   key={`${trade.hash}-${i}`}
@@ -99,7 +101,7 @@ export default function Trades({ trades, coin, layout = 'trades' }: TradesProps)
                 </div>
               ))}
             </div>
-          </div>
+          </>
         )}
       </div>
     );

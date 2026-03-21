@@ -4,12 +4,13 @@ import { memo, useEffect, useMemo, useRef, useState } from "react";
 import type { Book as BookData, Level } from "@/hooks/use-hyperliquid";
 import BookSkeleton from "./skeleton";
 import { useOrderBookLayout } from "@/context/order-book-layout";
+import cn from "classnames";
 
 const ROW_COUNT = 11;
 
 function fmt(n: number, decimals = 2) {
   return n.toLocaleString("en-US", {
-    minimumFractionDigits: decimals,
+    minimumFractionDigits: 0,
     maximumFractionDigits: decimals,
   });
 }
@@ -236,19 +237,20 @@ export default function Book({
   if (layout === "depth-view") {
     return (
       <div className="flex flex-col">
-        <div className="grid grid-cols-2 text-sm text-[#a7a7b7] py-2 border-b border-white/5">
-          <div className="grid grid-cols-2 px-2">
+        <div className={cn(
+          "relative grid grid-cols-2",
+          "after:absolute after:left-1/2 after:top-0 after:bottom-0 after:w-px after:bg-white/10 after:z-10",
+        )}>
+          <div className="grid grid-cols-2 text-sm text-[#a7a7b7] py-2 px-2 border-b border-white/10">
             <span>Price</span>
             <span className="text-right">Size</span>
           </div>
-          <div className="grid grid-cols-2 px-2 border-l border-white/5">
+          <div className="grid grid-cols-2 text-sm text-[#a7a7b7] py-2 px-2 border-b border-white/10">
             <span>Price</span>
             <span className="text-left pl-1">Size</span>
           </div>
-        </div>
-        <div className="grid grid-cols-2">
           {/* Asks — price DESC (lowest at bottom), bar from right */}
-          <div className="flex flex-col justify-end border-r border-white/5">
+          <div className="flex flex-col justify-end">
             {topAsks.map((level, i) => (
               <DepthRow
                 key={level.px}

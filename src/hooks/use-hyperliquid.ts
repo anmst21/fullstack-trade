@@ -68,7 +68,6 @@ export function useHyperliquid(coin = "BTC", nSigFigs?: 2 | 3 | 4 | 5) {
         if (id !== connId.current) return;
         try {
           const msg = JSON.parse(event.data);
-          console.log("[HL WS]", msg);
 
           if (msg.channel === "trades" && Array.isArray(msg.data)) {
             setTrades((prev) => [...msg.data, ...prev].slice(0, MAX_TRADES));
