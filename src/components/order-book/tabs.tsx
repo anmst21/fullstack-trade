@@ -9,6 +9,7 @@ import { useCoin } from '@/context/coin';
 import cn from 'classnames';
 import LayoutModal from './layout-modal';
 import TradesLayoutModal from '@/components/trades-feed/layout-modal';
+import Tooltip from '@/components/ui/tooltip';
 
 const TABS = [
   { route: 'order-book', label: 'Order Book' },
@@ -62,17 +63,19 @@ export default function Tabs() {
 
       {/* 3-dots button + modal */}
       <div className="ml-auto">
-        <button
-          ref={dotsRef}
-          onClick={() => setModalOpen(!modalOpen)}
-          className="px-4 py-2 sm:py-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-            <circle cx="8" cy="3" r="1.2" />
-            <circle cx="8" cy="8" r="1.2" />
-            <circle cx="8" cy="13" r="1.2" />
-          </svg>
-        </button>
+        <Tooltip content="View settings" align="right">
+          <button
+            ref={dotsRef}
+            onClick={() => setModalOpen(!modalOpen)}
+            className="px-4 py-2 sm:py-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <circle cx="8" cy="3" r="1.2" />
+              <circle cx="8" cy="8" r="1.2" />
+              <circle cx="8" cy="13" r="1.2" />
+            </svg>
+          </button>
+        </Tooltip>
         {isTradesRoute
           ? <TradesLayoutModal triggerRef={dotsRef} />
           : <LayoutModal triggerRef={dotsRef} />

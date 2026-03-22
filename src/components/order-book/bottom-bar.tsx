@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ChevDown } from '@/components/icons/chev-down';
 import { fmtGroup } from '@/helpers/formatters';
 import cn from 'classnames';
+import Tooltip from '@/components/ui/tooltip';
 
 interface BottomBarProps {
   coin: string;
@@ -22,15 +23,21 @@ export default function BottomBar({ coin, asset, onAssetChange, groupIdx, groupO
 
       {/* grouping dropdown — opens upward */}
       <div className="relative">
-        <button
-          onClick={() => setSigOpen((v) => !v)}
-          className="flex items-center gap-3 hover:text-[var(--text-primary)] transition-colors font-mono cursor-pointer"
+        <Tooltip
+          content="Price grouping — merges nearby price levels into buckets of this size. Smaller values show more granular levels, larger values consolidate the book for a broader view of supply and demand."
+          side="top"
+          align="left"
         >
-          {fmtGroup(groupOptions[groupIdx])}
-          <span style={{ transition: 'transform 0.2s', transform: sigOpen ? 'rotate(0deg)' : 'rotate(180deg)', display: 'inline-flex' }}>
-            <ChevDown />
-          </span>
-        </button>
+          <button
+            onClick={() => setSigOpen((v) => !v)}
+            className="flex items-center gap-3 hover:text-[var(--text-primary)] transition-colors font-mono cursor-pointer"
+          >
+            {fmtGroup(groupOptions[groupIdx])}
+            <span style={{ transition: 'transform 0.2s', transform: sigOpen ? 'rotate(0deg)' : 'rotate(180deg)', display: 'inline-flex' }}>
+              <ChevDown />
+            </span>
+          </button>
+        </Tooltip>
 
         {sigOpen && (
           <>
@@ -55,18 +62,22 @@ export default function BottomBar({ coin, asset, onAssetChange, groupIdx, groupO
 
       {/* size unit toggle */}
       <div className="flex items-center gap-2 font-mono">
-        <button
-          onClick={() => onAssetChange('USDC')}
-          className={cn('transition-colors cursor-pointer', asset === 'USDC' ? 'text-[var(--text-primary)] font-medium' : 'hover:text-[var(--text-primary)]')}
-        >
-          USDC
-        </button>
-        <button
-          onClick={() => onAssetChange(coin)}
-          className={cn('transition-colors', asset === coin ? 'text-[var(--text-primary)] font-medium' : 'hover:text-[var(--text-primary)]')}
-        >
-          {coin}
-        </button>
+        <Tooltip content="Show sizes in USDC" align="right" side="top">
+          <button
+            onClick={() => onAssetChange('USDC')}
+            className={cn('transition-colors cursor-pointer', asset === 'USDC' ? 'text-[var(--text-primary)] font-medium' : 'hover:text-[var(--text-primary)]')}
+          >
+            USDC
+          </button>
+        </Tooltip>
+        <Tooltip content={`Show sizes in ${coin}`} align="right" side="top">
+          <button
+            onClick={() => onAssetChange(coin)}
+            className={cn('transition-colors cursor-pointer', asset === coin ? 'text-[var(--text-primary)] font-medium' : 'hover:text-[var(--text-primary)]')}
+          >
+            {coin}
+          </button>
+        </Tooltip>
       </div>
     </div>
   );

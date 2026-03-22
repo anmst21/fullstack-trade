@@ -8,6 +8,7 @@ import { fmtPrice } from '@/helpers/formatters';
 import CoinModal from './coin-modal';
 import cn from 'classnames';
 import { coinIconUrl } from '@/helpers/urls';
+import Tooltip from '@/components/ui/tooltip';
 
 export default function TokenHeader() {
   const { coin, meta } = useCoin();
@@ -81,9 +82,11 @@ export default function TokenHeader() {
                   ? `$${(vol / 1e6).toFixed(2)}M`
                   : `$${vol.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
               return (
-                <span className="text-[10px] sm:text-[12px] text-[var(--text-secondary)]">
-                  Vol {formatted}
-                </span>
+                <Tooltip content="24h trading volume" align="right">
+                  <span className="text-[10px] sm:text-[12px] text-[var(--text-secondary)] cursor-help">
+                    Vol {formatted}
+                  </span>
+                </Tooltip>
               );
             })() : (
               <span className="shimmer rounded w-[70px] h-[14px] mt-1" />
