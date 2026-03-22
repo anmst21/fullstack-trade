@@ -7,10 +7,10 @@ import { OrderBook, DepthView, BuyOrder, SellOrder } from '@/components/icons';
 import { useTradesLayout, type TradesLayoutMode } from '@/context/trades-layout';
 
 const OPTIONS: { id: TradesLayoutMode; label: string; Icon: React.FC }[] = [
-  { id: 'trades',      label: 'Trades',      Icon: OrderBook  },
-  { id: 'depth-view',  label: 'Depth View',  Icon: DepthView  },
-  { id: 'buy-trades',  label: 'Buy Trades',  Icon: BuyOrder   },
-  { id: 'sell-trades', label: 'Sell Trades', Icon: SellOrder  },
+  { id: 'trades',      label: 'Trades',      Icon: OrderBook },
+  { id: 'depth-view',  label: 'Depth View',  Icon: DepthView },
+  { id: 'buy-trades',  label: 'Buy Trades',  Icon: BuyOrder },
+  { id: 'sell-trades', label: 'Sell Trades',  Icon: SellOrder },
 ];
 
 interface Props {

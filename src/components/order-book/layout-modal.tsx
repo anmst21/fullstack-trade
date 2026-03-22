@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import cn from 'classnames';
 import { createPortal } from 'react-dom';
 import { OrderBook, DepthView, BuyOrder, SellOrder } from '@/components/icons';
