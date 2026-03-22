@@ -3,19 +3,25 @@
 import { useEffect, useRef, useState } from 'react';
 import { HYPERLIQUID_WS } from '@/helpers/urls';
 
+const RECONNECT_DELAY = 2000;
+
 export function useLastPrice(coin: string) {
   const [lastPrice, setLastPrice] = useState<number | undefined>();
   const [prevPrice, setPrevPrice] = useState<number | undefined>();
   const ws = useRef<WebSocket | null>(null);
-  const connId = useRef(0);
+  const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const id = ++connId.current;
+    let aborted = false;
+
+    // Reset immediately so the UI shows a loading skeleton while reconnecting.
+    /* eslint-disable react-hooks/set-state-in-effect */
     setLastPrice(undefined);
     setPrevPrice(undefined);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     function connect() {
-      if (id !== connId.current) return;
+      if (aborted) return;
       const socket = new WebSocket(HYPERLIQUID_WS);
       ws.current = socket;
 
@@ -27,7 +33,7 @@ export function useLastPrice(coin: string) {
       };
 
       socket.onmessage = (event) => {
-        if (id !== connId.current) return;
+        if (aborted) return;
         try {
           const msg = JSON.parse(event.data);
           if (msg.channel === 'trades' && Array.isArray(msg.data) && msg.data.length > 0) {
@@ -43,8 +49,8 @@ export function useLastPrice(coin: string) {
       };
 
       socket.onclose = () => {
-        if (id !== connId.current) return;
-        setTimeout(connect, 2000);
+        if (aborted) return;
+        reconnectTimer.current = setTimeout(connect, RECONNECT_DELAY);
       };
 
       socket.onerror = () => socket.close();
@@ -53,10 +59,24 @@ export function useLastPrice(coin: string) {
     connect();
 
     return () => {
-      connId.current++;
+      aborted = true;
+      if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
       const socket = ws.current;
       ws.current = null;
-      socket?.close(1000, 'unmounting');
+      if (!socket) return;
+
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+          method: 'unsubscribe',
+          subscription: { type: 'trades', coin },
+        }));
+        socket.close(1000, 'unmounting');
+      } else if (socket.readyState === WebSocket.CONNECTING) {
+        socket.onopen = () => socket.close(1000, 'unmounting');
+        socket.onmessage = null;
+        socket.onerror = () => socket.close();
+        socket.onclose = null;
+      }
     };
   }, [coin]);
 
