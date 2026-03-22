@@ -3,7 +3,7 @@ import { ROW_COUNT, DEPTH_ROW_COUNT } from '@/helpers/constants';
 
 const DURATION = 1600; // ms, must match CSS animation duration
 const TOTAL_ROWS = ROW_COUNT * 2 + 1; // asks + spread + bids
-const TRADES_ROWS = 24;
+const TRADES_ROWS = 28;
 const ROW_H = 'var(--row-h)';
 
 const SPREAD_H = 'var(--spread-h)';

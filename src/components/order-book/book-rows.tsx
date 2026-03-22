@@ -92,7 +92,9 @@ export const DepthRow = memo(function DepthRow({
         style={{
           [isBid ? "left" : "right"]: 0,
           width: `${pct}%`,
-          background: isBid ? "var(--color-bid-bar)" : "var(--color-ask-bar)",
+          background: isBid
+            ? "var(--color-bid-bar)"
+            : "linear-gradient(90deg, rgba(255, 49, 0, 0.14), rgba(255, 49, 0, 0.03))",
           transition: "width 200ms ease-out",
         }}
       />

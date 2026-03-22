@@ -13,15 +13,16 @@
   --color-surface-modal: #1c1c21;
   --color-dot-ring: #f0f757;
 
-  --color-bid-bar: rgba(161, 255, 0, 0.08);
-  --color-ask-bar: rgba(255, 49, 0, 0.08);
+  --color-bid-bar: linear-gradient(270deg, rgba(161, 255, 0, 0.14), rgba(161, 255, 0, 0.03));
+  --color-ask-bar: linear-gradient(270deg, rgba(255, 49, 0, 0.14), rgba(255, 49, 0, 0.03));
   --color-bid-badge: rgba(161, 255, 0, 0.1);
 
   --row-h: 20px;
   --spread-h: 22px;
   --col-header-h: 24px;
-  --bottom-bar-h: 28px;
-  --widget-content-h: calc(var(--col-header-h) + var(--row-h) * 22 + var(--spread-h) + var(--col-header-h) + var(--bottom-bar-h));
+  --bottom-bar-h: 29px;
+  --book-scroll-h: calc(var(--row-h) * 22 + var(--spread-h));
+  --tab-content-h: calc(var(--col-header-h) + var(--book-scroll-h) + var(--bottom-bar-h));
 }
 
 @media (min-width: 640px) {
@@ -29,7 +30,7 @@
     --row-h: 26px;
     --spread-h: 30px;
     --col-header-h: 36px;
-    --bottom-bar-h: 36px;
+    --bottom-bar-h: 37px;
   }
 }
 

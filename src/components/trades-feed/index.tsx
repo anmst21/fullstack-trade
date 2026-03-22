@@ -11,7 +11,7 @@ export default function TradesFeed() {
   const { layout } = useTradesLayout();
 
   return (
-    <div className="overflow-y-auto" style={{ height: 'var(--widget-content-h)' }}>
+    <div className="overflow-y-auto" style={{ height: 'var(--tab-content-h)' }}>
       <Trades trades={trades} coin={coin} layout={layout} />
     </div>
   );
