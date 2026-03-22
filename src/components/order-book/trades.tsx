@@ -22,7 +22,7 @@ function TradeRow({ trade }: { trade: Trade }) {
       <span style={{ color: isBuy ? "var(--color-bid)" : "var(--color-ask)" }}>
         {fmt(trade.px, 0)}
       </span>
-      <span className="text-right text-[var(--text-tertiary)]">{fmt(trade.sz)}</span>
+      <span className="text-right text-[var(--text-tertiary)]">{fmt(trade.sz, 5, 5)}</span>
       <span className="flex items-center justify-end gap-1 text-[var(--text-secondary)]">
         {formatTime(trade.time)}
         <a
@@ -56,8 +56,8 @@ export default function Trades({ trades, coin, layout = 'trades' }: TradesProps)
           <span className="text-right">Size</span>
         </div>
         <div className="grid grid-cols-2 text-xs sm:text-sm text-[var(--text-secondary)] py-1 sm:py-2 px-3 border-b border-white/10">
-          <span>Price</span>
-          <span className="text-right">Size</span>
+          <span>Size</span>
+          <span className="text-right">Price</span>
         </div>
         {isEmpty ? (
           <>
@@ -74,7 +74,7 @@ export default function Trades({ trades, coin, layout = 'trades' }: TradesProps)
                   onClick={() => window.open(explorerTxUrl(trade.hash), '_blank', 'noopener,noreferrer')}
                 >
                   <span style={{ color: 'var(--color-bid)' }}>{fmt(trade.px, 0)}</span>
-                  <span className="text-right text-[var(--text-tertiary)]">{fmt(trade.sz)}</span>
+                  <span className="text-right text-[var(--text-tertiary)]">{fmt(trade.sz, 5, 5)}</span>
                 </div>
               ))}
             </div>
@@ -85,8 +85,8 @@ export default function Trades({ trades, coin, layout = 'trades' }: TradesProps)
                   className="grid grid-cols-2 text-xs sm:text-sm py-[2px] sm:py-[3px] px-3 hover:bg-white/5 cursor-default"
                   onClick={() => window.open(explorerTxUrl(trade.hash), '_blank', 'noopener,noreferrer')}
                 >
-                  <span style={{ color: 'var(--color-ask)' }}>{fmt(trade.px, 0)}</span>
-                  <span className="text-right text-[var(--text-tertiary)]">{fmt(trade.sz)}</span>
+                  <span className="text-[var(--text-tertiary)]">{fmt(trade.sz, 5, 5)}</span>
+                  <span className="text-right" style={{ color: 'var(--color-ask)' }}>{fmt(trade.px, 0)}</span>
                 </div>
               ))}
             </div>
