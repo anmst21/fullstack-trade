@@ -6,8 +6,8 @@ export const DepthView = () => (
     fill="none"
     viewBox="0 0 20 20"
   >
-    <path fill="var(--color-bid)" d="M17 2v6h-6V2z"></path>
-    <path fill="var(--color-ask)" d="M9 2v6H3V2z"></path>
+    <path fill="var(--color-ask)" d="M17 2v6h-6V2z"></path>
+    <path fill="var(--color-bid)" d="M9 2v6H3V2z"></path>
     <path
       fill="currentColor"
       fillRule="evenodd"

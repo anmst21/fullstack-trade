@@ -8,21 +8,27 @@ import BookColumnHeader from "./column-header";
 import BottomBar from "./bottom-bar";
 
 export const MULTIPLIERS = [1, 2, 5, 10, 100, 1000];
-const NSIGFIGS_BY_IDX = [5, 4, 4, 3, 3, 2] as const;
+const NSIGFIGS_BY_IDX = [5, 4, 4, 3, 2, 2] as const;
 
 function readStorage<T>(key: string): T | null {
   try {
     const raw = window.localStorage.getItem(key);
     return raw ? (JSON.parse(raw) as T) : null;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 function writeStorage(key: string, value: unknown) {
-  try { window.localStorage.setItem(key, JSON.stringify(value)); } catch {}
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {}
 }
 
 function removeStorage(key: string) {
-  try { window.localStorage.removeItem(key); } catch {}
+  try {
+    window.localStorage.removeItem(key);
+  } catch {}
 }
 
 export default function OrderBook() {
@@ -48,19 +54,24 @@ export default function OrderBook() {
   };
 
   // --- asset unit: persist per reload, reset to coin on coin switch ---
-  const [unitState, setUnitState] = useState({ coin, unit: "coin" as "USDC" | "coin" });
+  const [unitState, setUnitState] = useState({
+    coin,
+    unit: "coin" as "USDC" | "coin",
+  });
   if (unitState.coin !== coin) {
     setUnitState({ coin, unit: "coin" });
     removeStorage("ob-asset-unit");
   }
   useEffect(() => {
-    const stored = readStorage<{ coin: string; unit: "USDC" | "coin" }>("ob-asset-unit");
+    const stored = readStorage<{ coin: string; unit: "USDC" | "coin" }>(
+      "ob-asset-unit",
+    );
     if (stored && stored.coin === coin) setUnitState(stored);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const asset = unitState.unit === "USDC" ? "USDC" : coin;
   const setAsset = (v: string) => {
-    const unit = v === "USDC" ? "USDC" as const : "coin" as const;
+    const unit = v === "USDC" ? ("USDC" as const) : ("coin" as const);
     const next = { coin, unit };
     setUnitState(next);
     writeStorage("ob-asset-unit", next);
@@ -87,9 +98,9 @@ export default function OrderBook() {
 
   const group = groupOptions[groupIdx];
   const empty = book.bids.length === 0 && book.asks.length === 0;
-  const [hasLoaded, setHasLoaded] = useState(false);
-  if (!empty && !hasLoaded) setHasLoaded(true);
-  const isLoading = !hasLoaded && empty;
+  const [loadedCoin, setLoadedCoin] = useState<string | null>(null);
+  if (!empty && loadedCoin !== coin) setLoadedCoin(coin);
+  const isLoading = loadedCoin !== coin && empty;
 
   return (
     <>

@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from "react";
 import { Row, SpreadBar, AggTooltip } from "../book-rows";
 import type { LayoutProps } from "../book-rows";
 import { ROW_COUNT } from "@/helpers/constants";
+import { useHasHover } from "@/hooks/use-has-hover";
 
 export default function OrderBookLayout({
   topAsks,
@@ -17,6 +18,7 @@ export default function OrderBookLayout({
   spreadDecimals,
   spreadPct,
 }: LayoutProps) {
+  const hasHover = useHasHover();
   const [hoveredAskIdx, setHoveredAskIdx] = useState<number | null>(null);
   const [hoveredBidIdx, setHoveredBidIdx] = useState<number | null>(null);
   const askRowEls = useRef<(HTMLDivElement | null)[]>([]);
@@ -43,32 +45,35 @@ export default function OrderBookLayout({
     setHoveredAskIdx(null);
   }, []);
 
+  const safeAskIdx = hoveredAskIdx != null && hoveredAskIdx < topAsks.length ? hoveredAskIdx : null;
+  const safeBidIdx = hoveredBidIdx != null && hoveredBidIdx < topBids.length ? hoveredBidIdx : null;
+
   let askAgg = null;
-  if (hoveredAskIdx != null) {
+  if (safeAskIdx != null) {
     let sumSz = 0, sumWt = 0;
-    for (let i = hoveredAskIdx; i < topAsks.length; i++) {
+    for (let i = safeAskIdx; i < topAsks.length; i++) {
       sumSz += askDisplaySizes[i];
       sumWt += askDisplaySizes[i] * parseFloat(topAsks[i].px);
     }
-    askAgg = { avgPx: sumSz > 0 ? sumWt / sumSz : 0, sumSz, sumTotal: askTotals[hoveredAskIdx] };
+    askAgg = { avgPx: sumSz > 0 ? sumWt / sumSz : 0, sumSz, sumTotal: askTotals[safeAskIdx] };
   }
 
   let bidAgg = null;
-  if (hoveredBidIdx != null) {
+  if (safeBidIdx != null) {
     let sumSz = 0, sumWt = 0;
-    for (let i = 0; i <= hoveredBidIdx; i++) {
+    for (let i = 0; i <= safeBidIdx; i++) {
       sumSz += bidDisplaySizes[i];
       sumWt += bidDisplaySizes[i] * parseFloat(topBids[i].px);
     }
-    bidAgg = { avgPx: sumSz > 0 ? sumWt / sumSz : 0, sumSz, sumTotal: bidTotals[hoveredBidIdx] };
+    bidAgg = { avgPx: sumSz > 0 ? sumWt / sumSz : 0, sumSz, sumTotal: bidTotals[safeBidIdx] };
   }
 
   return (
-    <div className="flex flex-col" onMouseLeave={clearHover}>
+    <div className="flex flex-col" onMouseLeave={hasHover ? clearHover : undefined}>
       <div
         className="flex flex-col justify-end overflow-visible"
         style={{ height: `calc(var(--row-h) * ${ROW_COUNT})` }}
-        onMouseOver={handleAskOver}
+        onMouseOver={hasHover ? handleAskOver : undefined}
       >
         {topAsks.map((level, i) => (
           <div key={level.px} data-idx={i} ref={el => { askRowEls.current[i] = el; }}>
@@ -80,8 +85,8 @@ export default function OrderBookLayout({
               side="ask"
               szDecimals={szDecimals}
               flash={flashedPrices.has(level.px)}
-              highlighted={hoveredAskIdx != null && i >= hoveredAskIdx}
-              hoverBorder={i === hoveredAskIdx ? "top" : false}
+              highlighted={safeAskIdx != null && i >= safeAskIdx}
+              hoverBorder={i === safeAskIdx ? "top" : false}
             />
           </div>
         ))}
@@ -92,7 +97,7 @@ export default function OrderBookLayout({
       <div
         className="flex flex-col"
         style={{ height: `calc(var(--row-h) * ${ROW_COUNT})` }}
-        onMouseOver={handleBidOver}
+        onMouseOver={hasHover ? handleBidOver : undefined}
       >
         {topBids.map((level, i) => (
           <div key={level.px} data-idx={i} ref={el => { bidRowEls.current[i] = el; }}>
@@ -104,15 +109,15 @@ export default function OrderBookLayout({
               side="bid"
               szDecimals={szDecimals}
               flash={flashedPrices.has(level.px)}
-              highlighted={hoveredBidIdx != null && i <= hoveredBidIdx}
-              hoverBorder={i === hoveredBidIdx ? "bottom" : false}
+              highlighted={safeBidIdx != null && i <= safeBidIdx}
+              hoverBorder={i === safeBidIdx ? "bottom" : false}
             />
           </div>
         ))}
       </div>
 
-      {askAgg && <AggTooltip {...askAgg} szDecimals={szDecimals} side="ask" anchorEl={askRowEls.current[hoveredAskIdx!]} />}
-      {bidAgg && <AggTooltip {...bidAgg} szDecimals={szDecimals} side="bid" anchorEl={bidRowEls.current[hoveredBidIdx!]} />}
+      {hasHover && askAgg && <AggTooltip {...askAgg} szDecimals={szDecimals} side="ask" anchorEl={askRowEls.current[safeAskIdx!]} />}
+      {hasHover && bidAgg && <AggTooltip {...bidAgg} szDecimals={szDecimals} side="bid" anchorEl={bidRowEls.current[safeBidIdx!]} />}
     </div>
   );
 }

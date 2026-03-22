@@ -1,6 +1,6 @@
-export function fmt(n: number | string, decimals = 2) {
+export function fmt(n: number | string, decimals = 2, minDecimals = 0) {
   return (typeof n === "string" ? parseFloat(n) : n).toLocaleString("en-US", {
-    minimumFractionDigits: 0,
+    minimumFractionDigits: minDecimals,
     maximumFractionDigits: decimals,
   });
 }

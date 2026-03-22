@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from "react";
 import { Row, SpreadBar, AggTooltip } from "../book-rows";
 import type { LayoutProps } from "../book-rows";
 import { DEPTH_ROW_COUNT } from "@/helpers/constants";
+import { useHasHover } from "@/hooks/use-has-hover";
 
 export default function BuyOrderLayout({
   topBids,
@@ -14,6 +15,7 @@ export default function BuyOrderLayout({
   spreadDecimals,
   spreadPct,
 }: LayoutProps) {
+  const hasHover = useHasHover();
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const rowEls = useRef<(HTMLDivElement | null)[]>([]);
   const clearHover = useCallback(() => setHoveredIdx(null), []);
@@ -35,11 +37,11 @@ export default function BuyOrderLayout({
   }
 
   return (
-    <div className="flex flex-col" onMouseLeave={clearHover}>
+    <div className="flex flex-col" onMouseLeave={hasHover ? clearHover : undefined}>
       <div
         className="flex flex-col"
         style={{ minHeight: `calc(var(--row-h) * ${DEPTH_ROW_COUNT})` }}
-        onMouseOver={handleOver}
+        onMouseOver={hasHover ? handleOver : undefined}
       >
         {topBids.map((level, i) => (
           <div key={level.px} data-idx={i} ref={el => { rowEls.current[i] = el; }}>
@@ -58,7 +60,7 @@ export default function BuyOrderLayout({
         ))}
       </div>
       <SpreadBar spread={spread} spreadDecimals={spreadDecimals} spreadPct={spreadPct} />
-      {agg && <AggTooltip {...agg} szDecimals={szDecimals} side="bid" anchorEl={rowEls.current[hoveredIdx!]} />}
+      {hasHover && agg && <AggTooltip {...agg} szDecimals={szDecimals} side="bid" anchorEl={rowEls.current[hoveredIdx!]} />}
     </div>
   );
 }
