@@ -44,7 +44,7 @@ interface BookSkeletonProps {
 export default function BookSkeleton({ layout = 'order-book' }: BookSkeletonProps) {
   if (layout === 'depth-view') {
     return (
-      <div className="flex flex-col">
+      <div className="flex flex-col" style={{ minHeight: 'var(--book-scroll-h)' }}>
         <div className="grid grid-cols-2">
           <div className="flex flex-col border-r border-white/5">
             {Array.from({ length: DEPTH_ROW_COUNT }, (_, i) => (
@@ -71,23 +71,43 @@ export default function BookSkeleton({ layout = 'order-book' }: BookSkeletonProp
             ))}
           </div>
         </div>
-        <SpreadSkeleton index={DEPTH_ROW_COUNT} total={DEPTH_ROW_COUNT + 1} />
+        <div className="mt-auto">
+          <SpreadSkeleton index={DEPTH_ROW_COUNT} total={DEPTH_ROW_COUNT + 1} />
+        </div>
       </div>
     );
   }
 
   const singleSide = layout === 'buy-order' || layout === 'sell-order';
 
-  const rowCount = singleSide ? DEPTH_ROW_COUNT : ROW_COUNT;
-  const totalRows = singleSide ? DEPTH_ROW_COUNT : TOTAL_ROWS;
+  if (singleSide) {
+    return (
+      <div className="flex flex-col" style={{ minHeight: 'var(--book-scroll-h)' }}>
+        <div className="flex flex-col">
+          {Array.from({ length: DEPTH_ROW_COUNT }, (_, i) => (
+            <div
+              key={i}
+              className="shimmer"
+              style={{
+                height: ROW_H,
+                animationDelay: `-${(i / (DEPTH_ROW_COUNT - 1)) * DURATION}ms`,
+              }}
+            />
+          ))}
+        </div>
+        <div className="mt-auto">
+          <SpreadSkeleton index={DEPTH_ROW_COUNT} total={DEPTH_ROW_COUNT + 1} />
+        </div>
+      </div>
+    );
+  }
 
-  const rows: { height: string | number; rowIndex: number }[] = singleSide
-    ? Array.from({ length: rowCount }, (_, i) => ({ height: ROW_H, rowIndex: i }))
-    : [
-        ...Array.from({ length: ROW_COUNT }, (_, i) => ({ height: ROW_H, rowIndex: i })),
-        { height: SPREAD_H, rowIndex: 11 },
-        ...Array.from({ length: ROW_COUNT }, (_, i) => ({ height: ROW_H, rowIndex: i + 12 })),
-      ];
+  // Default order-book skeleton
+  const rows: { height: string | number; rowIndex: number }[] = [
+    ...Array.from({ length: ROW_COUNT }, (_, i) => ({ height: ROW_H, rowIndex: i })),
+    { height: SPREAD_H, rowIndex: 11 },
+    ...Array.from({ length: ROW_COUNT }, (_, i) => ({ height: ROW_H, rowIndex: i + 12 })),
+  ];
 
   return (
     <div className="flex flex-col">
@@ -97,12 +117,10 @@ export default function BookSkeleton({ layout = 'order-book' }: BookSkeletonProp
           className="shimmer"
           style={{
             height,
-            animationDelay: `-${(rowIndex / (totalRows - 1)) * DURATION}ms`,
+            animationDelay: `-${(rowIndex / (TOTAL_ROWS - 1)) * DURATION}ms`,
           }}
         />
       ))}
-
-      {singleSide && <SpreadSkeleton index={DEPTH_ROW_COUNT} total={DEPTH_ROW_COUNT + 1} />}
     </div>
   );
 }

@@ -105,7 +105,7 @@ export default function OrderBook() {
   return (
     <>
       <BookColumnHeader asset={asset} />
-      <div className="overflow-y-auto">
+      <div className="overflow-y-auto" style={{ height: 'var(--book-scroll-h)' }}>
         <Book
           bids={book.bids}
           asks={book.asks}

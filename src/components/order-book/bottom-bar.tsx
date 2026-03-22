@@ -25,7 +25,7 @@ export default function BottomBar({ coin, asset, onAssetChange, groupIdx, groupO
       {/* grouping dropdown — opens upward */}
       <div className="relative">
         {isLoading ? (
-          <div className="shimmer rounded w-[42px] h-[20px]" />
+          <div className="shimmer rounded w-[42px] h-4 sm:h-5" />
         ) : (
           <>
             <Tooltip

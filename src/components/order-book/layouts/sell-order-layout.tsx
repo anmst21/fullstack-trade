@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { Row, SpreadBar, AggTooltip } from "../book-rows";
 import type { LayoutProps } from "../book-rows";
-import { DEPTH_ROW_COUNT } from "@/helpers/constants";
 import { useHasHover } from "@/hooks/use-has-hover";
 
 export default function SellOrderLayout({
@@ -42,10 +41,9 @@ export default function SellOrderLayout({
   }
 
   return (
-    <div className="flex flex-col" onMouseLeave={hasHover ? clearHover : undefined}>
+    <div className="flex flex-col" style={{ minHeight: 'var(--book-scroll-h)' }} onMouseLeave={hasHover ? clearHover : undefined}>
       <div
         className="flex flex-col"
-        style={{ minHeight: `calc(var(--row-h) * ${DEPTH_ROW_COUNT})` }}
         onMouseOver={hasHover ? handleOver : undefined}
       >
         {revAsks.map((level, i) => (
@@ -64,7 +62,9 @@ export default function SellOrderLayout({
           </div>
         ))}
       </div>
-      <SpreadBar spread={spread} spreadDecimals={spreadDecimals} spreadPct={spreadPct} />
+      <div className="mt-auto">
+        <SpreadBar spread={spread} spreadDecimals={spreadDecimals} spreadPct={spreadPct} />
+      </div>
       {hasHover && agg && <AggTooltip {...agg} szDecimals={szDecimals} side="ask" anchorEl={rowEls.current[hoveredIdx!]} />}
     </div>
   );

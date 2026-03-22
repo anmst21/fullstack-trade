@@ -2,7 +2,6 @@ import { useState, useCallback, useRef } from "react";
 import cn from "classnames";
 import { DepthRow, SpreadBar, AggTooltip } from "../book-rows";
 import type { LayoutProps } from "../book-rows";
-import { DEPTH_ROW_COUNT } from "@/helpers/constants";
 import { useHasHover } from "@/hooks/use-has-hover";
 
 export default function DepthViewLayout({
@@ -73,14 +72,14 @@ export default function DepthViewLayout({
   }
 
   return (
-    <div className="flex flex-col" onMouseLeave={hasHover ? clearHover : undefined}>
-      <div className={cn(
-        "relative grid grid-cols-2",
-        "after:absolute after:left-1/2 after:top-0 after:bottom-0 after:w-px after:bg-white/10 after:z-10",
-      )}>
+    <div className={cn(
+      "relative flex flex-col",
+      "after:absolute after:left-1/2 after:top-0 after:bottom-0 after:w-px after:bg-white/10 after:z-10",
+    )} style={{ minHeight: 'var(--book-scroll-h)' }} onMouseLeave={hasHover ? clearHover : undefined}>
+      <div className="grid grid-cols-2">
         <div
           className="flex flex-col"
-          style={{ minHeight: `calc(var(--row-h) * ${DEPTH_ROW_COUNT})` }}
+
           onMouseOver={hasHover ? handleBidOver : undefined}
         >
           {topBids.map((level, i) => (
@@ -101,7 +100,7 @@ export default function DepthViewLayout({
         </div>
         <div
           className="flex flex-col"
-          style={{ minHeight: `calc(var(--row-h) * ${DEPTH_ROW_COUNT})` }}
+
           onMouseOver={hasHover ? handleAskOver : undefined}
         >
           {revAsks.map((level, i) => (
@@ -121,10 +120,12 @@ export default function DepthViewLayout({
           ))}
         </div>
       </div>
-      <SpreadBar spread={spread} spreadDecimals={spreadDecimals} spreadPct={spreadPct} />
+      <div className="mt-auto">
+        <SpreadBar spread={spread} spreadDecimals={spreadDecimals} spreadPct={spreadPct} />
+      </div>
 
       {hasHover && bidAgg && <AggTooltip {...bidAgg} szDecimals={szDecimals} side="bid" anchorEl={bidRowEls.current[safeBidIdx!]} anchor="left" borderEdge="bottom" />}
-      {hasHover && askAgg && <AggTooltip {...askAgg} szDecimals={szDecimals} side="ask" anchorEl={askRowEls.current[safeAskIdx!]} anchor="right" />}
+      {hasHover && askAgg && <AggTooltip {...askAgg} szDecimals={szDecimals} side="ask" anchorEl={askRowEls.current[safeAskIdx!]} anchor="right" borderEdge="bottom" />}
     </div>
   );
 }
