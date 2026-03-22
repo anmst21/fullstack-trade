@@ -53,7 +53,7 @@ export default function Tabs() {
 
       {/* sliding indicator */}
       <span
-        className="absolute bottom-0 h-[2px] bg-[var(--color-bid)] z-10"
+        className="absolute bottom-0 h-[2px] bg-[var(--color-ask)] z-10"
         style={{
           left: indicator.left,
           width: indicator.width,
