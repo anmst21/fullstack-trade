@@ -8,10 +8,12 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   useEffect(() => {
     try {
       const item = window.localStorage.getItem(key);
-      if (item !== null) setStoredValue(JSON.parse(item) as T);
+      setStoredValue(item !== null ? (JSON.parse(item) as T) : initialValue);
     } catch (err) {
       console.warn('[useLocalStorage] failed to read key:', key, err);
     }
+    // initialValue is a default, not a reactive dependency
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
   const setValue = useCallback(
