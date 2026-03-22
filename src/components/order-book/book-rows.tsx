@@ -86,17 +86,30 @@ export const Row = memo(function Row({
   );
 });
 
+export interface DepthRowProps {
+  px: string;
+  sz: number;
+  total: number;
+  maxTotal: number;
+  side: "bid" | "ask";
+  szDecimals: number;
+  flash: boolean;
+  highlighted?: boolean;
+  hoverBorder?: "top" | "bottom" | false;
+}
+
 export const DepthRow = memo(function DepthRow({
   px,
   sz,
+  total,
   maxTotal,
   side,
   szDecimals,
   flash,
   highlighted,
   hoverBorder,
-}: Omit<RowProps, "total" | "barAlign">) {
-  const pct = maxTotal > 0 ? (sz / maxTotal) * 100 : 0;
+}: DepthRowProps) {
+  const pct = maxTotal > 0 ? (total / maxTotal) * 100 : 0;
   const isBid = side === "bid";
 
   return (
@@ -112,28 +125,49 @@ export const DepthRow = memo(function DepthRow({
       <span
         className="absolute top-0 bottom-0 pointer-events-none"
         style={{
-          [isBid ? "left" : "right"]: 0,
+          [isBid ? "right" : "left"]: 0,
           width: `${pct}%`,
           background: isBid
             ? "var(--color-bid-bar)"
-            : "linear-gradient(90deg, rgba(255, 49, 0, 0.14), rgba(255, 49, 0, 0.03))",
+            : "var(--color-ask-bar)",
           transition: "width 200ms ease-out",
         }}
       />
-      <span
-        style={{ color: isBid ? "var(--color-bid)" : "var(--color-ask)" }}
-        className={highlighted ? "font-medium" : undefined}
-      >
-        {fmt(parseFloat(px), 0)}
-      </span>
-      <span
-        className={highlighted
-          ? "text-right text-[var(--text-primary)] font-medium"
-          : "text-right text-[var(--text-tertiary)]"
-        }
-      >
-        {fmt(sz, szDecimals)}
-      </span>
+      {isBid ? (
+        <>
+          <span
+            className={highlighted
+              ? "text-[var(--text-primary)] font-medium"
+              : "text-[var(--text-tertiary)]"
+            }
+          >
+            {fmt(sz, szDecimals)}
+          </span>
+          <span
+            style={{ color: "var(--color-bid)" }}
+            className={cn("text-right", highlighted && "font-medium")}
+          >
+            {fmt(parseFloat(px), 0)}
+          </span>
+        </>
+      ) : (
+        <>
+          <span
+            style={{ color: "var(--color-ask)" }}
+            className={highlighted ? "font-medium" : undefined}
+          >
+            {fmt(parseFloat(px), 0)}
+          </span>
+          <span
+            className={highlighted
+              ? "text-right text-[var(--text-primary)] font-medium"
+              : "text-right text-[var(--text-tertiary)]"
+            }
+          >
+            {fmt(sz, szDecimals)}
+          </span>
+        </>
+      )}
     </div>
   );
 });
