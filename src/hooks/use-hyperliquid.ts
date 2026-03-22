@@ -25,23 +25,27 @@ export interface Book {
 
 import { HYPERLIQUID_WS } from "@/helpers/urls";
 
+const EMPTY_BOOK: Book = { bids: [], asks: [], spread: null };
 const MAX_TRADES = 50;
 const RECONNECT_DELAY = 2000;
 
 export function useHyperliquid(coin = "BTC", nSigFigs?: 2 | 3 | 4 | 5) {
   const [trades, setTrades] = useState<Trade[]>([]);
-  const [book, setBook] = useState<Book>({ bids: [], asks: [], spread: null });
+  const [book, setBook] = useState<Book>(EMPTY_BOOK);
   const ws = useRef<WebSocket | null>(null);
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const connId = useRef(0); // incremented on each effect run to invalidate stale callbacks
 
   useEffect(() => {
-    const id = ++connId.current;
-    setBook({ bids: [], asks: [], spread: null });
+    let aborted = false;
+
+    // Reset immediately so the UI shows a loading skeleton while reconnecting.
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setBook(EMPTY_BOOK);
     setTrades([]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     function connect() {
-      if (id !== connId.current) return; // stale — a newer effect has taken over
+      if (aborted) return;
 
       const socket = new WebSocket(HYPERLIQUID_WS);
       ws.current = socket;
@@ -66,7 +70,7 @@ export function useHyperliquid(coin = "BTC", nSigFigs?: 2 | 3 | 4 | 5) {
       };
 
       socket.onmessage = (event) => {
-        if (id !== connId.current) return;
+        if (aborted) return;
         try {
           const msg = JSON.parse(event.data);
 
@@ -84,7 +88,7 @@ export function useHyperliquid(coin = "BTC", nSigFigs?: 2 | 3 | 4 | 5) {
       };
 
       socket.onclose = () => {
-        if (id !== connId.current) return; // intentionally replaced — do not reconnect
+        if (aborted) return;
         reconnectTimer.current = setTimeout(connect, RECONNECT_DELAY);
       };
 
@@ -96,11 +100,13 @@ export function useHyperliquid(coin = "BTC", nSigFigs?: 2 | 3 | 4 | 5) {
     connect();
 
     return () => {
-      connId.current++; // invalidate this effect's callbacks
+      aborted = true;
       if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
       const socket = ws.current;
       ws.current = null;
-      if (socket && socket.readyState === WebSocket.OPEN) {
+      if (!socket) return;
+
+      if (socket.readyState === WebSocket.OPEN) {
         socket.send(
           JSON.stringify({
             method: "unsubscribe",
@@ -117,8 +123,13 @@ export function useHyperliquid(coin = "BTC", nSigFigs?: 2 | 3 | 4 | 5) {
             },
           }),
         );
+        socket.close(1000, "unmounting");
+      } else if (socket.readyState === WebSocket.CONNECTING) {
+        socket.onopen = () => socket.close(1000, "unmounting");
+        socket.onmessage = null;
+        socket.onerror = () => socket.close();
+        socket.onclose = null;
       }
-      socket?.close(1000, "unmounting");
     };
   }, [coin, nSigFigs]);
 
