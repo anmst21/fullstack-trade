@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useHyperliquid } from "@/hooks/use-hyperliquid";
 import { useCoin } from "@/context/coin";
-import { useLocalStorage } from "@/hooks/use-local-storage";
 import Book from "./book";
 import BookColumnHeader from "./column-header";
 import BottomBar from "./bottom-bar";
@@ -11,10 +10,62 @@ import BottomBar from "./bottom-bar";
 export const MULTIPLIERS = [1, 2, 5, 10, 100, 1000];
 const NSIGFIGS_BY_IDX = [5, 4, 4, 3, 3, 2] as const;
 
+function readStorage<T>(key: string): T | null {
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : null;
+  } catch { return null; }
+}
+
+function writeStorage(key: string, value: unknown) {
+  try { window.localStorage.setItem(key, JSON.stringify(value)); } catch {}
+}
+
+function removeStorage(key: string) {
+  try { window.localStorage.removeItem(key); } catch {}
+}
+
 export default function OrderBook() {
   const { coin } = useCoin();
-  const [groupIdx, setGroupIdx] = useState(0);
-  const [asset, setAsset] = useLocalStorage<string>("ob-asset", coin);
+
+  // --- group idx: persist per reload, reset to 0 on coin switch ---
+  const [groupState, setGroupState] = useState({ coin, idx: 0 });
+  if (groupState.coin !== coin) {
+    setGroupState({ coin, idx: 0 });
+    removeStorage("ob-group");
+  }
+  // Hydrate from localStorage on mount only (avoids SSR mismatch)
+  useEffect(() => {
+    const stored = readStorage<{ coin: string; idx: number }>("ob-group");
+    if (stored && stored.coin === coin) setGroupState(stored);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const groupIdx = groupState.idx;
+  const setGroupIdx = (idx: number) => {
+    const next = { coin, idx };
+    setGroupState(next);
+    writeStorage("ob-group", next);
+  };
+
+  // --- asset unit: persist per reload, reset to coin on coin switch ---
+  const [unitState, setUnitState] = useState({ coin, unit: "coin" as "USDC" | "coin" });
+  if (unitState.coin !== coin) {
+    setUnitState({ coin, unit: "coin" });
+    removeStorage("ob-asset-unit");
+  }
+  useEffect(() => {
+    const stored = readStorage<{ coin: string; unit: "USDC" | "coin" }>("ob-asset-unit");
+    if (stored && stored.coin === coin) setUnitState(stored);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const asset = unitState.unit === "USDC" ? "USDC" : coin;
+  const setAsset = (v: string) => {
+    const unit = v === "USDC" ? "USDC" as const : "coin" as const;
+    const next = { coin, unit };
+    setUnitState(next);
+    writeStorage("ob-asset-unit", next);
+  };
+
   const nSigFigs = NSIGFIGS_BY_IDX[groupIdx];
   const { book } = useHyperliquid(coin, nSigFigs);
 
@@ -35,6 +86,10 @@ export default function OrderBook() {
   }
 
   const group = groupOptions[groupIdx];
+  const empty = book.bids.length === 0 && book.asks.length === 0;
+  const [hasLoaded, setHasLoaded] = useState(false);
+  if (!empty && !hasLoaded) setHasLoaded(true);
+  const isLoading = !hasLoaded && empty;
 
   return (
     <>
@@ -55,6 +110,7 @@ export default function OrderBook() {
         groupIdx={groupIdx}
         groupOptions={groupOptions}
         onGroupIdxChange={setGroupIdx}
+        isLoading={isLoading}
       />
     </>
   );
