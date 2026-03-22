@@ -48,7 +48,7 @@ export default function Trades({ trades, coin, layout = 'trades' }: TradesProps)
     const sells = trades.filter((t) => t.side === 'A');
     return (
       <div className={cn(
-        "relative grid grid-cols-2",
+        "relative grid grid-cols-2 grid-rows-[auto_1fr] min-h-full",
         "after:absolute after:left-1/2 after:top-0 after:bottom-0 after:w-px after:bg-white/10 after:z-10",
       )}>
         <div className="grid grid-cols-2 text-xs sm:text-sm text-[var(--text-secondary)] py-1 sm:py-2 px-3 border-b border-white/10">

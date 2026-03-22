@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState } from 'react';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 
 export type TradesLayoutMode = 'trades' | 'depth-view' | 'buy-trades' | 'sell-trades';
 
@@ -14,7 +15,7 @@ interface TradesLayoutContextValue {
 const TradesLayoutContext = createContext<TradesLayoutContextValue | null>(null);
 
 export function TradesLayoutProvider({ children }: { children: React.ReactNode }) {
-  const [layout, setLayout] = useState<TradesLayoutMode>('trades');
+  const [layout, setLayout] = useLocalStorage<TradesLayoutMode>('trades-layout', 'trades');
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
