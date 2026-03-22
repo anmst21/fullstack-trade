@@ -3,6 +3,7 @@ import cn from "classnames";
 import { DepthRow, SpreadBar, AggTooltip } from "../book-rows";
 import type { LayoutProps } from "../book-rows";
 import { DEPTH_ROW_COUNT } from "@/helpers/constants";
+import { useHasHover } from "@/hooks/use-has-hover";
 
 export default function DepthViewLayout({
   topAsks,
@@ -18,6 +19,12 @@ export default function DepthViewLayout({
   spreadDecimals,
   spreadPct,
 }: LayoutProps) {
+  // Reverse asks so closest-to-spread (lowest price) is at top, matching Hyperliquid depth view
+  const revAsks = [...topAsks].reverse();
+  const revAskSizes = [...askDisplaySizes].reverse();
+  const revAskTotals = [...askTotals].reverse();
+
+  const hasHover = useHasHover();
   const [hoveredAskIdx, setHoveredAskIdx] = useState<number | null>(null);
   const [hoveredBidIdx, setHoveredBidIdx] = useState<number | null>(null);
   const askRowEls = useRef<(HTMLDivElement | null)[]>([]);
@@ -42,28 +49,31 @@ export default function DepthViewLayout({
     setHoveredAskIdx(null);
   }, []);
 
+  const safeAskIdx = hoveredAskIdx != null && hoveredAskIdx < revAsks.length ? hoveredAskIdx : null;
+  const safeBidIdx = hoveredBidIdx != null && hoveredBidIdx < topBids.length ? hoveredBidIdx : null;
+
   let askAgg = null;
-  if (hoveredAskIdx != null) {
+  if (safeAskIdx != null) {
     let sumSz = 0, sumWt = 0;
-    for (let i = 0; i <= hoveredAskIdx; i++) {
-      sumSz += askDisplaySizes[i];
-      sumWt += askDisplaySizes[i] * parseFloat(topAsks[i].px);
+    for (let i = 0; i <= safeAskIdx; i++) {
+      sumSz += revAskSizes[i];
+      sumWt += revAskSizes[i] * parseFloat(revAsks[i].px);
     }
-    askAgg = { avgPx: sumSz > 0 ? sumWt / sumSz : 0, sumSz, sumTotal: askTotals[hoveredAskIdx] };
+    askAgg = { avgPx: sumSz > 0 ? sumWt / sumSz : 0, sumSz, sumTotal: revAskTotals[safeAskIdx] };
   }
 
   let bidAgg = null;
-  if (hoveredBidIdx != null) {
+  if (safeBidIdx != null) {
     let sumSz = 0, sumWt = 0;
-    for (let i = 0; i <= hoveredBidIdx; i++) {
+    for (let i = 0; i <= safeBidIdx; i++) {
       sumSz += bidDisplaySizes[i];
       sumWt += bidDisplaySizes[i] * parseFloat(topBids[i].px);
     }
-    bidAgg = { avgPx: sumSz > 0 ? sumWt / sumSz : 0, sumSz, sumTotal: bidTotals[hoveredBidIdx] };
+    bidAgg = { avgPx: sumSz > 0 ? sumWt / sumSz : 0, sumSz, sumTotal: bidTotals[safeBidIdx] };
   }
 
   return (
-    <div className="flex flex-col" onMouseLeave={clearHover}>
+    <div className="flex flex-col" onMouseLeave={hasHover ? clearHover : undefined}>
       <div className={cn(
         "relative grid grid-cols-2",
         "after:absolute after:left-1/2 after:top-0 after:bottom-0 after:w-px after:bg-white/10 after:z-10",
@@ -71,19 +81,20 @@ export default function DepthViewLayout({
         <div
           className="flex flex-col"
           style={{ minHeight: `calc(var(--row-h) * ${DEPTH_ROW_COUNT})` }}
-          onMouseOver={handleAskOver}
+          onMouseOver={hasHover ? handleBidOver : undefined}
         >
-          {topAsks.map((level, i) => (
-            <div key={level.px} data-idx={i} ref={el => { askRowEls.current[i] = el; }}>
+          {topBids.map((level, i) => (
+            <div key={level.px} data-idx={i} ref={el => { bidRowEls.current[i] = el; }}>
               <DepthRow
                 px={level.px}
-                sz={askDisplaySizes[i]}
+                sz={bidTotals[i]}
+                total={bidTotals[i]}
                 maxTotal={maxTotal}
-                side="ask"
+                side="bid"
                 szDecimals={szDecimals}
                 flash={flashedPrices.has(level.px)}
-                highlighted={hoveredAskIdx != null && i <= hoveredAskIdx}
-                hoverBorder={i === hoveredAskIdx ? "bottom" : false}
+                highlighted={safeBidIdx != null && i <= safeBidIdx}
+                hoverBorder={i === safeBidIdx ? "bottom" : false}
               />
             </div>
           ))}
@@ -91,19 +102,20 @@ export default function DepthViewLayout({
         <div
           className="flex flex-col"
           style={{ minHeight: `calc(var(--row-h) * ${DEPTH_ROW_COUNT})` }}
-          onMouseOver={handleBidOver}
+          onMouseOver={hasHover ? handleAskOver : undefined}
         >
-          {topBids.map((level, i) => (
-            <div key={level.px} data-idx={i} ref={el => { bidRowEls.current[i] = el; }}>
+          {revAsks.map((level, i) => (
+            <div key={level.px} data-idx={i} ref={el => { askRowEls.current[i] = el; }}>
               <DepthRow
                 px={level.px}
-                sz={bidDisplaySizes[i]}
+                sz={revAskTotals[i]}
+                total={revAskTotals[i]}
                 maxTotal={maxTotal}
-                side="bid"
+                side="ask"
                 szDecimals={szDecimals}
                 flash={flashedPrices.has(level.px)}
-                highlighted={hoveredBidIdx != null && i <= hoveredBidIdx}
-                hoverBorder={i === hoveredBidIdx ? "bottom" : false}
+                highlighted={safeAskIdx != null && i <= safeAskIdx}
+                hoverBorder={i === safeAskIdx ? "bottom" : false}
               />
             </div>
           ))}
@@ -111,8 +123,8 @@ export default function DepthViewLayout({
       </div>
       <SpreadBar spread={spread} spreadDecimals={spreadDecimals} spreadPct={spreadPct} />
 
-      {askAgg && <AggTooltip {...askAgg} szDecimals={szDecimals} side="ask" anchorEl={askRowEls.current[hoveredAskIdx!]} anchor="left" borderEdge="bottom" />}
-      {bidAgg && <AggTooltip {...bidAgg} szDecimals={szDecimals} side="bid" anchorEl={bidRowEls.current[hoveredBidIdx!]} anchor="right" />}
+      {hasHover && bidAgg && <AggTooltip {...bidAgg} szDecimals={szDecimals} side="bid" anchorEl={bidRowEls.current[safeBidIdx!]} anchor="left" borderEdge="bottom" />}
+      {hasHover && askAgg && <AggTooltip {...askAgg} szDecimals={szDecimals} side="ask" anchorEl={askRowEls.current[safeAskIdx!]} anchor="right" />}
     </div>
   );
 }
