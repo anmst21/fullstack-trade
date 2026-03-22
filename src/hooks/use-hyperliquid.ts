@@ -38,11 +38,8 @@ export function useHyperliquid(coin = "BTC", nSigFigs?: 2 | 3 | 4 | 5) {
   const [book, setBook] = useState<Book>(EMPTY_BOOK);
   const ws = useRef<WebSocket | null>(null);
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Track current nSigFigs so onopen always subscribes with the latest value.
   const sigFigsRef = useRef(nSigFigs);
   const prevSigFigsRef = useRef(nSigFigs);
-  // Number of l2Book frames to skip after resubscribe (stale frames from old sub).
-  const skipCountRef = useRef(0);
 
   // --- Main effect: socket lifecycle, depends only on coin ---
   useEffect(() => {
@@ -83,10 +80,12 @@ export function useHyperliquid(coin = "BTC", nSigFigs?: 2 | 3 | 4 | 5) {
           }
 
           if (msg.channel === "l2Book" && msg.data?.levels) {
-            // After resubscribe, skip one stale frame from the old subscription
-            if (skipCountRef.current > 0) { skipCountRef.current--; return; }
             const [bids, asks] = msg.data.levels as [Level[], Level[]];
-            setBook({ bids, asks, spread: msg.data.spread ?? null });
+            setBook((prev) => ({
+              bids: bids.length > 0 ? bids : prev.bids,
+              asks: asks.length > 0 ? asks : prev.asks,
+              spread: msg.data.spread ?? null,
+            }));
           }
         } catch (err) {
           console.warn('[useHyperliquid] malformed WebSocket frame', err);
@@ -147,13 +146,7 @@ export function useHyperliquid(coin = "BTC", nSigFigs?: 2 | 3 | 4 | 5) {
     const socket = ws.current;
     if (!socket || socket.readyState !== WebSocket.OPEN) return;
 
-    // Clear book so skeleton shows during transition, skip one stale frame
-    // from the old subscription before accepting the new snapshot.
-    skipCountRef.current = 1;
-    /* eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: sync state with WS resubscribe */
-    setBook(EMPTY_BOOK);
-
-    // Unsubscribe old, subscribe new — on the same live connection.
+    // Unsubscribe old, subscribe new — don't clear book, let new snapshot overwrite.
     socket.send(
       JSON.stringify({
         method: "unsubscribe",

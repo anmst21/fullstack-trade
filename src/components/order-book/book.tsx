@@ -31,10 +31,12 @@ export default function Book({
   const rowCount = layout === "order-book" ? ROW_COUNT : DEPTH_ROW_COUNT;
 
   const topAsks = useMemo(
-    () =>
-      applyGrouping(asks, group, "ask")
-        .sort((a, b) => parseFloat(b.px) - parseFloat(a.px))
-        .slice(0, rowCount),
+    () => {
+      const grouped = applyGrouping(asks, group, "ask");
+      // Sort ascending to pick the closest-to-spread asks, then flip to descending for display
+      grouped.sort((a, b) => parseFloat(a.px) - parseFloat(b.px));
+      return grouped.slice(0, rowCount).sort((a, b) => parseFloat(b.px) - parseFloat(a.px));
+    },
     [asks, group, rowCount],
   );
   const topBids = useMemo(
