@@ -71,12 +71,55 @@
   100% { background: transparent; }
 }
 
-.flash-row-bid {
+.flash-row-bid,
+.flash-row-ask {
+  position: relative;
+}
+
+.flash-row-bid::after,
+.flash-row-ask::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.flash-row-bid::after {
   animation: sz-flash-bid 300ms ease-out forwards;
 }
 
-.flash-row-ask {
+.flash-row-ask::after {
   animation: sz-flash-ask 300ms ease-out forwards;
+}
+
+@media (hover: hover) {
+  .ob-row-highlighted {
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .ob-row-border-top {
+    background-image: repeating-linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.25) 0px,
+      rgba(255, 255, 255, 0.25) 4px,
+      transparent 4px,
+      transparent 8px
+    );
+    background-size: 100% 1px;
+    background-position: top;
+    background-repeat: no-repeat;
+  }
+  .ob-row-border-bottom {
+    background-image: repeating-linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.25) 0px,
+      rgba(255, 255, 255, 0.25) 4px,
+      transparent 4px,
+      transparent 8px
+    );
+    background-size: 100% 1px;
+    background-position: bottom;
+    background-repeat: no-repeat;
+  }
 }
 
 .token-btn .chev {
@@ -94,4 +137,7 @@ body {
   background: var(--surface-0);
   color: var(--text-primary);
   font-family: var(--font-sans), Arial, sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: default;
 }
