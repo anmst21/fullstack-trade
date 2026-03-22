@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from "react";
 import { Row, SpreadBar, AggTooltip } from "../book-rows";
 import type { LayoutProps } from "../book-rows";
 import { DEPTH_ROW_COUNT } from "@/helpers/constants";
+import { useHasHover } from "@/hooks/use-has-hover";
 
 export default function SellOrderLayout({
   topAsks,
@@ -14,6 +15,12 @@ export default function SellOrderLayout({
   spreadDecimals,
   spreadPct,
 }: LayoutProps) {
+  // Reverse so lowest price (closest to spread) is at top
+  const revAsks = [...topAsks].reverse();
+  const revSizes = [...askDisplaySizes].reverse();
+  const revTotals = [...askTotals].reverse();
+
+  const hasHover = useHasHover();
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const rowEls = useRef<(HTMLDivElement | null)[]>([]);
   const clearHover = useCallback(() => setHoveredIdx(null), []);
@@ -27,38 +34,38 @@ export default function SellOrderLayout({
   let agg = null;
   if (hoveredIdx != null) {
     let sumSz = 0, sumWt = 0;
-    for (let i = hoveredIdx; i < topAsks.length; i++) {
-      sumSz += askDisplaySizes[i];
-      sumWt += askDisplaySizes[i] * parseFloat(topAsks[i].px);
+    for (let i = 0; i <= hoveredIdx; i++) {
+      sumSz += revSizes[i];
+      sumWt += revSizes[i] * parseFloat(revAsks[i].px);
     }
-    agg = { avgPx: sumSz > 0 ? sumWt / sumSz : 0, sumSz, sumTotal: askTotals[hoveredIdx] };
+    agg = { avgPx: sumSz > 0 ? sumWt / sumSz : 0, sumSz, sumTotal: revTotals[hoveredIdx] };
   }
 
   return (
-    <div className="flex flex-col" onMouseLeave={clearHover}>
+    <div className="flex flex-col" onMouseLeave={hasHover ? clearHover : undefined}>
       <div
         className="flex flex-col"
         style={{ minHeight: `calc(var(--row-h) * ${DEPTH_ROW_COUNT})` }}
-        onMouseOver={handleOver}
+        onMouseOver={hasHover ? handleOver : undefined}
       >
-        {topAsks.map((level, i) => (
+        {revAsks.map((level, i) => (
           <div key={level.px} data-idx={i} ref={el => { rowEls.current[i] = el; }}>
             <Row
               px={level.px}
-              sz={askDisplaySizes[i]}
-              total={askTotals[i]}
+              sz={revSizes[i]}
+              total={revTotals[i]}
               maxTotal={maxTotal}
               side="ask"
               szDecimals={szDecimals}
               flash={flashedPrices.has(level.px)}
-              highlighted={hoveredIdx != null && i >= hoveredIdx}
-              hoverBorder={i === hoveredIdx ? "top" : false}
+              highlighted={hoveredIdx != null && i <= hoveredIdx}
+              hoverBorder={i === hoveredIdx ? "bottom" : false}
             />
           </div>
         ))}
       </div>
       <SpreadBar spread={spread} spreadDecimals={spreadDecimals} spreadPct={spreadPct} />
-      {agg && <AggTooltip {...agg} szDecimals={szDecimals} side="ask" anchorEl={rowEls.current[hoveredIdx!]} />}
+      {hasHover && agg && <AggTooltip {...agg} szDecimals={szDecimals} side="ask" anchorEl={rowEls.current[hoveredIdx!]} />}
     </div>
   );
 }
