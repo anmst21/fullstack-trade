@@ -5,15 +5,16 @@ import { useHyperliquid } from "@/hooks/use-hyperliquid";
 import { useCoin } from "@/context/coin";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import Book from "./book";
+import BookColumnHeader from "./column-header";
 import BottomBar from "./bottom-bar";
 
 export const MULTIPLIERS = [1, 2, 5, 10, 100, 1000];
-const NSIGFIGS_BY_IDX = [5, 5, 5, 4, 3, 2] as const;
+const NSIGFIGS_BY_IDX = [5, 4, 4, 3, 3, 2] as const;
 
 export default function OrderBook() {
   const { coin } = useCoin();
   const [groupIdx, setGroupIdx] = useState(0);
-  const [asset, setAsset] = useLocalStorage<string>('ob-asset', coin);
+  const [asset, setAsset] = useLocalStorage<string>("ob-asset", coin);
   const nSigFigs = NSIGFIGS_BY_IDX[groupIdx];
   const { book } = useHyperliquid(coin, nSigFigs);
 
@@ -37,6 +38,7 @@ export default function OrderBook() {
 
   return (
     <>
+      <BookColumnHeader asset={asset} />
       <div className="overflow-y-auto">
         <Book
           bids={book.bids}

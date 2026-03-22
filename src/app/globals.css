@@ -19,12 +19,17 @@
 
   --row-h: 20px;
   --spread-h: 22px;
+  --col-header-h: 24px;
+  --bottom-bar-h: 28px;
+  --widget-content-h: calc(var(--col-header-h) + var(--row-h) * 22 + var(--spread-h) + var(--col-header-h) + var(--bottom-bar-h));
 }
 
 @media (min-width: 640px) {
   :root {
     --row-h: 26px;
     --spread-h: 30px;
+    --col-header-h: 36px;
+    --bottom-bar-h: 36px;
   }
 }
 

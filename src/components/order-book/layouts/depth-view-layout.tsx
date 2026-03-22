@@ -21,14 +21,6 @@ export default function DepthViewLayout({
         "relative grid grid-cols-2",
         "after:absolute after:left-1/2 after:top-0 after:bottom-0 after:w-px after:bg-white/10 after:z-10",
       )}>
-        <div className="grid grid-cols-2 text-xs sm:text-sm text-[var(--text-secondary)] py-1 sm:py-2 px-3 border-b border-white/10">
-          <span>Price</span>
-          <span className="text-right">Size</span>
-        </div>
-        <div className="grid grid-cols-2 text-xs sm:text-sm text-[var(--text-secondary)] py-1 sm:py-2 px-3 border-b border-white/10">
-          <span>Price</span>
-          <span className="text-right">Size</span>
-        </div>
         <div className="flex flex-col" style={{ minHeight: `calc(var(--row-h) * ${DEPTH_ROW_COUNT})` }}>
           {topAsks.map((level, i) => (
             <DepthRow

@@ -45,16 +45,6 @@ export default function BookSkeleton({ layout = 'order-book' }: BookSkeletonProp
   if (layout === 'depth-view') {
     return (
       <div className="flex flex-col">
-        <div className="grid grid-cols-2 text-xs sm:text-sm text-[var(--text-secondary)] py-1 sm:py-2 border-b border-white/5">
-          <div className="grid grid-cols-2 px-2">
-            <span>Price</span>
-            <span className="text-right">Size</span>
-          </div>
-          <div className="grid grid-cols-2 px-2 border-l border-white/5">
-            <span>Price</span>
-            <span className="text-right">Size</span>
-          </div>
-        </div>
         <div className="grid grid-cols-2">
           <div className="flex flex-col border-r border-white/5">
             {Array.from({ length: DEPTH_ROW_COUNT }, (_, i) => (
@@ -101,12 +91,6 @@ export default function BookSkeleton({ layout = 'order-book' }: BookSkeletonProp
 
   return (
     <div className="flex flex-col">
-      <div className="grid grid-cols-3 text-xs sm:text-sm text-[var(--text-secondary)] px-3 py-1 sm:py-2">
-        <span>Price</span>
-        <span className="text-right">Size</span>
-        <span className="text-right">Total</span>
-      </div>
-
       {rows.map(({ height, rowIndex }) => (
         <div
           key={rowIndex}

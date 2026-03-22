@@ -16,11 +16,6 @@ export default function SellOrderLayout({
 }: LayoutProps) {
   return (
     <div className="flex flex-col">
-      <div className="grid grid-cols-3 text-xs sm:text-sm text-[var(--text-secondary)] px-3 py-1 sm:py-2">
-        <span>Price</span>
-        <span className="text-right">Size ({asset})</span>
-        <span className="text-right">Total ({asset})</span>
-      </div>
       <div className="flex flex-col" style={{ minHeight: `calc(var(--row-h) * ${DEPTH_ROW_COUNT})` }}>
         {topAsks.map((level, i) => (
           <Row
