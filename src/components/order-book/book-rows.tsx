@@ -196,12 +196,12 @@ export function AggTooltip({ avgPx, sumSz, sumTotal, szDecimals, side, anchorEl,
       {/* Arrow border layer */}
       <div className={cn(
         "absolute top-1/2 -translate-y-1/2 w-[10px] h-[10px] rotate-45 bg-[var(--color-surface-modal)] z-[1]",
-        isRight ? "-left-[6px] border-l border-b border-white/10" : "-right-[6px] border-r border-t border-white/10",
+        isRight ? "-left-[5px] border-l border-b border-white/10" : "-right-[5px] border-r border-t border-white/10",
       )} />
       {/* Arrow cover — hides the card border at the junction */}
       <div className={cn(
-        "absolute top-1/2 -translate-y-1/2 w-[2px] h-[10px] bg-[var(--color-surface-modal)] z-[3]",
-        isRight ? "-left-px" : "-right-px",
+        "absolute top-1/2 -translate-y-1/2 w-[3px] h-[12px] bg-[var(--color-surface-modal)] z-[3]",
+        isRight ? "left-0" : "right-0",
       )} />
       <div className="relative z-[2] bg-[var(--color-surface-modal)] border border-white/10 rounded-lg shadow-xl px-3 py-2 text-xs whitespace-nowrap">
         <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5">
