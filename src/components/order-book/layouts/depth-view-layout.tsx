@@ -74,7 +74,8 @@ export default function DepthViewLayout({
   return (
     <div className={cn(
       "relative flex flex-col",
-      "after:absolute after:left-1/2 after:top-0 after:bottom-0 after:w-px after:bg-white/10 after:z-10",
+      "after:absolute after:left-1/2 after:top-0 after:w-px after:bg-white/10 after:z-10",
+      "after:bottom-[var(--spread-h)]",
     )} style={{ minHeight: 'var(--book-scroll-h)' }} onMouseLeave={hasHover ? clearHover : undefined}>
       <div className="grid grid-cols-2">
         <div
