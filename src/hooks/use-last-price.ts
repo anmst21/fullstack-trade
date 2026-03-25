@@ -5,11 +5,16 @@ import { HYPERLIQUID_WS } from '@/helpers/urls';
 
 const RECONNECT_DELAY = 2000;
 
-export function useLastPrice(coin: string) {
+export function useLastPrice(coin: string, paused = false) {
   const [lastPrice, setLastPrice] = useState<number | undefined>();
   const [prevPrice, setPrevPrice] = useState<number | undefined>();
   const ws = useRef<WebSocket | null>(null);
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pausedRef = useRef(paused);
+
+  useEffect(() => {
+    pausedRef.current = paused;
+  }, [paused]);
 
   useEffect(() => {
     let aborted = false;
@@ -33,7 +38,7 @@ export function useLastPrice(coin: string) {
       };
 
       socket.onmessage = (event) => {
-        if (aborted) return;
+        if (aborted || pausedRef.current) return;
         try {
           const msg = JSON.parse(event.data);
           if (msg.channel === 'trades' && Array.isArray(msg.data) && msg.data.length > 0) {

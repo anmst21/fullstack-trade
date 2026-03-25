@@ -85,7 +85,14 @@ export default function Book({
   const [flashedPrices, setFlashedPrices] = useState<Set<string>>(new Set());
 
   useEffect(() => {
+    prevSizesRef.current = new Map();
+    setFlashedPrices(new Set());
+  }, [asset]);
+
+  useEffect(() => {
     const changed = new Set<string>();
+    const nextSizes = new Map<string, number>();
+
     for (const level of [...topAsks, ...topBids]) {
       const curr = parseFloat(level.sz);
       if (
@@ -94,8 +101,12 @@ export default function Book({
       ) {
         changed.add(level.px);
       }
-      prevSizesRef.current.set(level.px, curr);
+      nextSizes.set(level.px, curr);
     }
+
+    // Replace entirely — stale prices not in current view are discarded
+    prevSizesRef.current = nextSizes;
+
     if (changed.size > 0) {
       setFlashedPrices(changed);
       const t = setTimeout(() => setFlashedPrices(new Set()), 300);

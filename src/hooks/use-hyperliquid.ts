@@ -33,13 +33,21 @@ function bookSub(coin: string, nSigFigs?: number) {
   return { type: "l2Book" as const, coin, ...(nSigFigs ? { nSigFigs } : {}) };
 }
 
-export function useHyperliquid(coin = "BTC", nSigFigs?: 2 | 3 | 4 | 5) {
+const BOOK_THROTTLE_MS = 200; // ~5 updates/sec — each l2Book msg is a full snapshot
+
+export function useHyperliquid(coin = "BTC", nSigFigs?: 2 | 3 | 4 | 5, paused = false) {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [book, setBook] = useState<Book>(EMPTY_BOOK);
   const ws = useRef<WebSocket | null>(null);
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sigFigsRef = useRef(nSigFigs);
   const prevSigFigsRef = useRef(nSigFigs);
+  const pausedRef = useRef(paused);
+  const lastBookUpdateRef = useRef(0);
+
+  useEffect(() => {
+    pausedRef.current = paused;
+  }, [paused]);
 
   // --- Main effect: socket lifecycle, depends only on coin ---
   useEffect(() => {
@@ -48,6 +56,7 @@ export function useHyperliquid(coin = "BTC", nSigFigs?: 2 | 3 | 4 | 5) {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- reset on coin change
     setBook(EMPTY_BOOK);
     setTrades([]);
+    lastBookUpdateRef.current = 0;
 
     function connect() {
       if (aborted) return;
@@ -71,7 +80,7 @@ export function useHyperliquid(coin = "BTC", nSigFigs?: 2 | 3 | 4 | 5) {
       };
 
       socket.onmessage = (event) => {
-        if (aborted) return;
+        if (aborted || pausedRef.current) return;
         try {
           const msg = JSON.parse(event.data);
 
@@ -80,6 +89,10 @@ export function useHyperliquid(coin = "BTC", nSigFigs?: 2 | 3 | 4 | 5) {
           }
 
           if (msg.channel === "l2Book" && msg.data?.levels) {
+            const now = Date.now();
+            if (now - lastBookUpdateRef.current < BOOK_THROTTLE_MS) return;
+            lastBookUpdateRef.current = now;
+
             const [bids, asks] = msg.data.levels as [Level[], Level[]];
             setBook((prev) => ({
               bids: bids.length > 0 ? bids : prev.bids,

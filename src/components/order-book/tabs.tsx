@@ -62,7 +62,7 @@ export default function Tabs() {
       />
 
       {/* 3-dots button + modal */}
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center">
         <Tooltip content="View settings" align="right">
           <button
             ref={dotsRef}

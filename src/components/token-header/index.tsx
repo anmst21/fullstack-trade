@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { useCoin } from '@/context/coin';
 import { ChevDown, ChartIcon } from '@/components/icons';
 import { useLastPrice } from '@/hooks/use-last-price';
+import { usePageVisible } from '@/hooks/use-page-visible';
 import { fmtPrice } from '@/helpers/formatters';
 import CoinModal from './coin-modal';
 import cn from 'classnames';
@@ -12,7 +13,8 @@ import Tooltip from '@/components/ui/tooltip';
 
 export default function TokenHeader() {
   const { coin, meta } = useCoin();
-  const { lastPrice, direction } = useLastPrice(coin);
+  const visible = usePageVisible();
+  const { lastPrice, direction } = useLastPrice(coin, !visible);
   const [modalOpen, setModalOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 

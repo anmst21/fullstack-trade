@@ -125,12 +125,8 @@
 .token-btn .chev {
   transition: transform 0.2s ease-out;
 }
-.token-btn:hover .chev {
-  transform: rotate(-90deg) translateY(2px);
-}
-.token-btn:active .chev,
 .token-btn.active .chev {
-  transform: rotate(-90deg) translateY(4px);
+  transform: rotate(180deg);
 }
 
 body {

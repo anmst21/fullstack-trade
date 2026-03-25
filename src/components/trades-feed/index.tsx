@@ -4,10 +4,12 @@ import { useHyperliquid } from '@/hooks/use-hyperliquid';
 import Trades from '@/components/order-book/trades';
 import { useTradesLayout } from '@/context/trades-layout';
 import { useCoin } from '@/context/coin';
+import { usePageVisible } from '@/hooks/use-page-visible';
 
 export default function TradesFeed() {
   const { coin } = useCoin();
-  const { trades } = useHyperliquid(coin);
+  const visible = usePageVisible();
+  const { trades } = useHyperliquid(coin, undefined, !visible);
   const { layout } = useTradesLayout();
 
   return (

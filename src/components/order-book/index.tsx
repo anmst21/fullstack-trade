@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useHyperliquid } from "@/hooks/use-hyperliquid";
 import { useCoin } from "@/context/coin";
+import { usePageVisible } from "@/hooks/use-page-visible";
 import Book from "./book";
 import BookColumnHeader from "./column-header";
 import BottomBar from "./bottom-bar";
@@ -33,6 +34,7 @@ function removeStorage(key: string) {
 
 export default function OrderBook() {
   const { coin } = useCoin();
+  const visible = usePageVisible();
 
   // --- group idx: persist per reload, reset to 0 on coin switch ---
   const [groupState, setGroupState] = useState({ coin, idx: 0 });
@@ -78,7 +80,7 @@ export default function OrderBook() {
   };
 
   const nSigFigs = NSIGFIGS_BY_IDX[groupIdx];
-  const { book } = useHyperliquid(coin, nSigFigs);
+  const { book } = useHyperliquid(coin, nSigFigs, !visible);
 
   const refPrice = book.asks[0]?.px ?? book.bids[0]?.px;
   const [groupOptions, setGroupOptions] = useState<number[]>(() => {
