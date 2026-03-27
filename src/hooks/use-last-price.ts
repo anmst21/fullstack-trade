@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
-import { HYPERLIQUID_WS } from '@/helpers/urls';
+import { useEffect, useRef, useState } from "react";
+import { HYPERLIQUID_WS } from "@/helpers/urls";
 
 const RECONNECT_DELAY = 2000;
 
@@ -31,17 +31,23 @@ export function useLastPrice(coin: string, paused = false) {
       ws.current = socket;
 
       socket.onopen = () => {
-        socket.send(JSON.stringify({
-          method: 'subscribe',
-          subscription: { type: 'trades', coin },
-        }));
+        socket.send(
+          JSON.stringify({
+            method: "subscribe",
+            subscription: { type: "trades", coin },
+          }),
+        );
       };
 
       socket.onmessage = (event) => {
         if (aborted || pausedRef.current) return;
         try {
           const msg = JSON.parse(event.data);
-          if (msg.channel === 'trades' && Array.isArray(msg.data) && msg.data.length > 0) {
+          if (
+            msg.channel === "trades" &&
+            Array.isArray(msg.data) &&
+            msg.data.length > 0
+          ) {
             const price = parseFloat(msg.data[0].px);
             setLastPrice((prev) => {
               setPrevPrice(prev);
@@ -49,7 +55,7 @@ export function useLastPrice(coin: string, paused = false) {
             });
           }
         } catch (err) {
-          console.warn('[useLastPrice] malformed WebSocket frame', err);
+          console.warn("[useLastPrice] malformed WebSocket frame", err);
         }
       };
 
@@ -71,13 +77,15 @@ export function useLastPrice(coin: string, paused = false) {
       if (!socket) return;
 
       if (socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({
-          method: 'unsubscribe',
-          subscription: { type: 'trades', coin },
-        }));
-        socket.close(1000, 'unmounting');
+        socket.send(
+          JSON.stringify({
+            method: "unsubscribe",
+            subscription: { type: "trades", coin },
+          }),
+        );
+        socket.close(1000, "unmounting");
       } else if (socket.readyState === WebSocket.CONNECTING) {
-        socket.onopen = () => socket.close(1000, 'unmounting');
+        socket.onopen = () => socket.close(1000, "unmounting");
         socket.onmessage = null;
         socket.onerror = () => socket.close();
         socket.onclose = null;
@@ -85,12 +93,14 @@ export function useLastPrice(coin: string, paused = false) {
     };
   }, [coin]);
 
-  const direction: 'up' | 'down' | 'neutral' =
-    lastPrice === undefined || prevPrice === undefined || lastPrice === prevPrice
-      ? 'neutral'
+  const direction: "up" | "down" | "neutral" =
+    lastPrice === undefined ||
+    prevPrice === undefined ||
+    lastPrice === prevPrice
+      ? "neutral"
       : lastPrice > prevPrice
-        ? 'up'
-        : 'down';
+        ? "up"
+        : "down";
 
   return { lastPrice, prevPrice, direction };
 }

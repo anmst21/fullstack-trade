@@ -9,7 +9,7 @@ import BookColumnHeader from "./column-header";
 import BottomBar from "./bottom-bar";
 
 export const MULTIPLIERS = [1, 2, 5, 10, 100, 1000];
-const NSIGFIGS_BY_IDX = [5, 4, 4, 3, 2, 2] as const;
+const NSIGFIGS_BY_IDX = [5, 5, 4, 4, 3, 2] as const;
 
 function readStorage<T>(key: string): T | null {
   try {
@@ -107,7 +107,10 @@ export default function OrderBook() {
   return (
     <>
       <BookColumnHeader asset={asset} />
-      <div className="overflow-y-auto" style={{ height: 'var(--book-scroll-h)' }}>
+      <div
+        className="overflow-y-auto"
+        style={{ height: "var(--book-scroll-h)" }}
+      >
         <Book
           bids={book.bids}
           asks={book.asks}
