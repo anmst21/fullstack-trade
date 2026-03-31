@@ -30,15 +30,16 @@ export default function Book({
   const szDecimals = isUSDC ? 0 : 5;
   const rowCount = layout === "order-book" ? ROW_COUNT : DEPTH_ROW_COUNT;
 
-  const topAsks = useMemo(
-    () => {
-      const grouped = applyGrouping(asks, group, "ask");
-      // Sort ascending to pick the closest-to-spread asks, then flip to descending for display
-      grouped.sort((a, b) => parseFloat(a.px) - parseFloat(b.px));
-      return grouped.slice(0, rowCount).sort((a, b) => parseFloat(b.px) - parseFloat(a.px));
-    },
-    [asks, group, rowCount],
-  );
+  console.log({});
+
+  const topAsks = useMemo(() => {
+    const grouped = applyGrouping(asks, group, "ask");
+    // Sort ascending to pick the closest-to-spread asks, then flip to descending for display
+    grouped.sort((a, b) => parseFloat(a.px) - parseFloat(b.px));
+    return grouped
+      .slice(0, rowCount)
+      .sort((a, b) => parseFloat(b.px) - parseFloat(a.px));
+  }, [asks, group, rowCount]);
   const topBids = useMemo(
     () =>
       applyGrouping(bids, group, "bid")
@@ -83,6 +84,7 @@ export default function Book({
   // Flash tracking
   const prevSizesRef = useRef<Map<string, number>>(new Map());
   const [flashedPrices, setFlashedPrices] = useState<Set<string>>(new Set());
+  console.log({ flashedPrices });
 
   useEffect(() => {
     prevSizesRef.current = new Map();
@@ -92,12 +94,15 @@ export default function Book({
   useEffect(() => {
     const changed = new Set<string>();
     const nextSizes = new Map<string, number>();
-
+    console.log({ changed });
+    console.log({ changed, nextSizes });
     for (const level of [...topAsks, ...topBids]) {
-      const curr = parseFloat(level.sz);
+      const curr = parseFloat(level.px);
+      // console.log({ level });
       if (
-        prevSizesRef.current.has(level.px) &&
-        prevSizesRef.current.get(level.px) !== curr
+        !prevSizesRef.current.has(level.px)
+        // &&
+        // prevSizesRef.current.get(level.px) === curr
       ) {
         changed.add(level.px);
       }

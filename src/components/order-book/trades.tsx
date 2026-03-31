@@ -28,9 +28,9 @@ function TradeRow({ trade }: { trade: Trade }) {
 
     const t = Math.min(Math.max((sizeUsd - MIN) / (MAX - MIN), 0), 1);
     const height = Math.round(MIN_H + t * (MAX_H - MIN_H));
-    const alpha = +(0.1 + t * 0.5).toFixed(2);
+    const alpha = +(0.1 + t * 0.4).toFixed(2);
 
-    let emoji = "🦐";
+    let emoji = "";
     if (sizeUsd >= 10000) emoji = "🐋";
     else if (sizeUsd >= 1000) emoji = "🐬";
     else if (sizeUsd >= 100) emoji = "🐟";
